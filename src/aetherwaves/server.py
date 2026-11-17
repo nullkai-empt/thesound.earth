@@ -111,6 +111,7 @@ app = FastAPI(title="THESOUND.EARTH 3D Globe API")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
+    allow_origin_regex=r"https://.*\.pages\.dev",
     allow_origins=[
         "https://thesound.earth",
         "http://thesound.earth",
@@ -118,6 +119,8 @@ app.add_middleware(
         "http://www.thesound.earth",
         "http://127.0.0.1:8000",
         "http://localhost:8000",
+        "http://127.0.0.1:8080",
+        "http://localhost:8080",
         "https://thesound-earth.pages.dev",
     ],
     allow_credentials=True,
