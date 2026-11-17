@@ -2084,7 +2084,7 @@
     function loadGridDay(dayIdx = 0) {
       const entry = (gridManifest && gridManifest[dayIdx]) ? gridManifest[dayIdx] : null;
       const file = entry ? entry.file : `4_${dayIdx}.json`;
-      const url = STATIC_MODE ? `/data/grid/${file}` : `/api/grid?step=4&day_idx=${dayIdx}`;
+      const url = STATIC_MODE ? `/data/grid/${file}` : `${API_BASE}/api/grid?step=4&day_idx=${dayIdx}`;
       fetch(url).then(r => r.json()).then(d => {
         availableDates = d.dates || [];
         gridSnapshot = d.points || [];
@@ -3196,7 +3196,7 @@
       svsStatus.textContent = 'Connecting to NASA SVSâ€¦';
       try {
         const q = new URLSearchParams({ q: qVal, offset: svsOffset, limit: 24, eic_only: eicOnly });
-        const response = await fetch(`/api/svs/search?${q}`, { signal: _svsAbortController.signal });
+        const response = await fetch(`${API_BASE}/api/svs/search?${q}`, { signal: _svsAbortController.signal });
         if (!response.ok) throw new Error((await response.json()).detail || 'NASA SVS search failed.');
         const data = await response.json();
         _svsSearchSessionCache.set(cacheKey, data);
