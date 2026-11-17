@@ -1,9 +1,6 @@
 from __future__ import annotations
-try:
-    import truststore
-    truststore.inject_into_ssl()
-except Exception:
-    pass
+from .ssl_config import configure_global_ssl, get_ssl_context
+configure_global_ssl()
 import base64
 import json
 import logging

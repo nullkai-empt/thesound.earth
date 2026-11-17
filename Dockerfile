@@ -4,10 +4,13 @@ ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     HOME=/tmp \
     HF_HOME=/tmp/huggingface \
-    NUMBA_CACHE_DIR=/tmp/numba
+    NUMBA_CACHE_DIR=/tmp/numba \
+    SSL_CERT_FILE=/app/src/aetherwaves/nasa_ca_bundle.pem \
+    REQUESTS_CA_BUNDLE=/app/src/aetherwaves/nasa_ca_bundle.pem
 
-# Install system dependencies: ffmpeg, fluidsynth, FluidR3_GM, OpenCV libs, espeak-ng, curl
+# Install system dependencies: ca-certificates, ffmpeg, fluidsynth, FluidR3_GM, OpenCV libs, espeak-ng, curl
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     ffmpeg \
     fluidsynth \
     fluid-soundfont-gm \
@@ -33,6 +36,10 @@ RUN mkdir -p /app/models/whisper/base.en && \
     curl -L -s -o /app/models/whisper/base.en/model.bin https://huggingface.co/Systran/faster-whisper-base.en/resolve/main/model.bin && \
     curl -L -s -o /app/models/whisper/base.en/tokenizer.json https://huggingface.co/Systran/faster-whisper-base.en/resolve/main/tokenizer.json && \
     curl -L -s -o /app/models/whisper/base.en/vocabulary.txt https://huggingface.co/Systran/faster-whisper-base.en/resolve/main/vocabulary.txt
+
+# Pre-download OSCAR global 505MB NetCDF dataset from GitHub Release data-v1
+RUN mkdir -p /app/data && \
+    curl -L -s -o /app/data/oscar_global.nc https://github.com/nullkai-empt/thesound.earth/releases/download/data-v1/oscar_global.nc
 
 # Copy package metadata and install dependencies
 COPY pyproject.toml requirements.txt ./

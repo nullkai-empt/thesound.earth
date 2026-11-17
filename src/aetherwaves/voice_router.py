@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from .ssl_config import configure_global_ssl, get_ssl_context
+configure_global_ssl()
+
 import base64
 import hashlib
 import json
@@ -418,7 +421,7 @@ def _download_kokoro_file(url: str, dest_path: Path) -> bool:
             url,
             headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
         )
-        with urllib.request.urlopen(req, timeout=180) as resp, open(tmp_path, "wb") as f_out:
+        with urllib.request.urlopen(req, timeout=180, context=get_ssl_context()) as resp, open(tmp_path, "wb") as f_out:
             while chunk := resp.read(1024 * 1024):
                 f_out.write(chunk)
         if tmp_path.exists() and tmp_path.stat().st_size > 1000:
@@ -635,7 +638,7 @@ def ensure_whisper_model_files(model_dir: Path) -> bool:
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
                 tmp = target.with_suffix(target.suffix + ".tmp")
-                with urllib.request.urlopen(req, timeout=120) as resp, open(tmp, "wb") as f_out:
+                with urllib.request.urlopen(req, timeout=120, context=get_ssl_context()) as resp, open(tmp, "wb") as f_out:
                     while chunk := resp.read(1024 * 1024):
                         f_out.write(chunk)
                 if tmp.exists() and tmp.stat().st_size > 100:

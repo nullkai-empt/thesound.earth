@@ -1,10 +1,7 @@
 """NASA SVS discovery, metadata parsing and ephemeral visual frame analysis."""
 from __future__ import annotations
-try:
-    import truststore
-    truststore.inject_into_ssl()
-except Exception:
-    pass
+from .ssl_config import configure_global_ssl, get_ssl_context
+configure_global_ssl()
 
 import html
 import json
@@ -19,7 +16,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urljoin, urlparse, urlunparse
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 from PIL import Image, ImageFilter, ImageStat
 import numpy as np
@@ -64,7 +61,7 @@ class _SafeRedirect(HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-_opener = build_opener(_SafeRedirect())
+_opener = build_opener(_SafeRedirect(), HTTPSHandler(context=get_ssl_context()))
 
 
 def _get(url: str, *, timeout: float = 15, limit: int = MAX_LISTING_BYTES) -> bytes:
