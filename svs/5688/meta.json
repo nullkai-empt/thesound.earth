@@ -1,0 +1,93 @@
+{
+  "id": 5688,
+  "url": "https://svs.gsfc.nasa.gov/5688/",
+  "title": "El Ni\u00f1o 2026: Sea Surface Temperature Anomaly (2025 vs. 2026) \u2013 Updated Daily",
+  "description": "A side-by-side comparison of sea surface temperature anomalies in the tropical Pacific during 2025 and 2026, highlighting ocean temperature patterns associated with El Ni\u00f1o. This visualization is updated daily to incorporate the latest available data.",
+  "release_date": "2026-10-27T15:00:00-04:00",
+  "update_date": "2026-11-15T09:18:34.743022-05:00",
+  "datasets": [
+    {
+      "name": "Multi-scale Ultra-high Resolution (MUR) Sea Surface Temperature (SST) Analysis",
+      "common_name": "MUR SST",
+      "platform": null,
+      "sensor": null,
+      "type": "Analysis",
+      "organizations": [
+        "JPL PO DAAC"
+      ],
+      "description": "",
+      "credit": "",
+      "url": "",
+      "date_range": ""
+    }
+  ],
+  "credits": [
+    {
+      "role": "Data visualizer",
+      "people": [
+        {
+          "name": "Kel Elkins",
+          "employer": "Science and Technology Corporation"
+        }
+      ]
+    }
+  ],
+  "studio": "svs",
+  "made_for": null,
+  "media": [
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_wLegend_1670x835_latest.jpg",
+      "filename": "elnino_eic_ssta_globes_wLegend_1670x835_latest.jpg",
+      "format": "jpg",
+      "type": "Image",
+      "width": 1670,
+      "height": 835,
+      "alt_text": "Two side-by-side globes centered on the tropical Pacific Ocean, comparing sea surface temperature anomalies in 2025 and 2026. Red and blue shading highlights warmer- and cooler-than-average ocean temperatures, with a color bar legend showing the temperature differences in degrees Celsius."
+    },
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_wLegend_3340x1670_latest.jpg",
+      "filename": "elnino_eic_ssta_globes_wLegend_3340x1670_latest.jpg",
+      "format": "jpg",
+      "type": "Image",
+      "width": 3340,
+      "height": 1670,
+      "alt_text": "Two side-by-side globes centered on the tropical Pacific Ocean, comparing sea surface temperature anomalies in 2025 and 2026. Red and blue shading highlights warmer- and cooler-than-average ocean temperatures, with a color bar legend showing the temperature differences in degrees Celsius."
+    },
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_wLegend_3340x1670_latest.mp4",
+      "filename": "elnino_eic_ssta_globes_wLegend_3340x1670_latest.mp4",
+      "format": "mp4",
+      "type": "Movie",
+      "width": 3340,
+      "height": 1670,
+      "alt_text": "Two side-by-side globes centered on the tropical Pacific Ocean, comparing sea surface temperature anomalies in 2025 and 2026. Red and blue shading highlights warmer- and cooler-than-average ocean temperatures, with a color bar legend showing the temperature differences in degrees Celsius."
+    },
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_1670x835_latest.jpg",
+      "filename": "elnino_eic_ssta_globes_1670x835_latest.jpg",
+      "format": "jpg",
+      "type": "Image",
+      "width": 1670,
+      "height": 835,
+      "alt_text": "Two side-by-side globes centered on the tropical Pacific Ocean, comparing sea surface temperature anomalies in 2025 and 2026. Red and blue shading highlights regions of warmer- and cooler-than-average ocean temperatures."
+    },
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_3340x1670_latest.jpg",
+      "filename": "elnino_eic_ssta_globes_3340x1670_latest.jpg",
+      "format": "jpg",
+      "type": "Image",
+      "width": 3340,
+      "height": 1670,
+      "alt_text": "Two side-by-side globes centered on the tropical Pacific Ocean, comparing sea surface temperature anomalies in 2025 and 2026. Red and blue shading highlights regions of warmer- and cooler-than-average ocean temperatures."
+    },
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005688/elnino_eic_ssta_globes_3340x1670_latest.mp4",
+      "filename": "elnino_eic_ssta_globes_3340x1670_latest.mp4",
+      "format": "mp4",
+      "type": "Movie",
+      "width": 3340,
+      "height": 1670,
+      "alt_text": "Two side-by-side globes centered on the tropical Pacific Ocean, comparing sea surface temperature anomalies in 2025 and 2026. Red and blue shading highlights regions of warmer- and cooler-than-average ocean temperatures."
+    }
+  ]
+}

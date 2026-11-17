@@ -1,0 +1,14 @@
+/tracks/*
+  Cache-Control: public, max-age=86400
+
+/audio/*
+  Cache-Control: public, max-age=86400
+
+/svs/*
+  Cache-Control: public, max-age=86400
+
+/*.mp4
+  Cache-Control: public, max-age=86400
+
+/data/*
+  Cache-Control: public, max-age=86400

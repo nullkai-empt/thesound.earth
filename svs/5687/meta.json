@@ -1,0 +1,55 @@
+{
+  "id": 5687,
+  "url": "https://svs.gsfc.nasa.gov/5687/",
+  "title": "El Ni\u00f1o 2026: Ocean Apparent Visible Wavelength (2025 vs. 2026) \u2013 Updated Daily",
+  "description": "This visualization compares ocean apparent visible wavelength data from NASA's PACE mission in 2025 and 2026, highlighting changes in ocean color as El Ni\u00f1o develops in the Pacific Ocean. The visualization is automatically updated as new satellite data becomes available.",
+  "release_date": "2026-10-27T15:00:00-04:00",
+  "update_date": "2026-11-12T09:27:33.530054-05:00",
+  "datasets": [],
+  "credits": [
+    {
+      "role": "Data visualizer",
+      "people": [
+        {
+          "name": "Kel Elkins",
+          "employer": "Science and Technology Corporation"
+        }
+      ]
+    },
+    {
+      "role": "Scientist",
+      "people": [
+        {
+          "name": "Morgaine McKibben",
+          "employer": "SSAI"
+        },
+        {
+          "name": "Matthew Kehrli",
+          "employer": "GSFC"
+        }
+      ]
+    }
+  ],
+  "studio": "svs",
+  "made_for": null,
+  "media": [
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005687/elnino_avw_2025_2026_daily_1900x800.jpg",
+      "filename": "elnino_avw_2025_2026_daily_1900x800.jpg",
+      "format": "jpg",
+      "type": "Image",
+      "width": 1800,
+      "height": 900,
+      "alt_text": "Still image showing the latest available apparent visible wavelength (AVW) data for 2025 and 2026, displayed side by side on two Pacific Ocean globes. Ocean colors range from blue, indicating lower phytoplankton concentrations, to green and yellow, indicating higher concentrations. The image is automatically updated as new satellite data becomes available, providing an ongoing comparison of ocean conditions between the two years."
+    },
+    {
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005687/elnino_avw_2025_2026_daily_1900x800.mp4",
+      "filename": "elnino_avw_2025_2026_daily_1900x800.mp4",
+      "format": "mp4",
+      "type": "Movie",
+      "width": 1800,
+      "height": 900,
+      "alt_text": "Still image showing the latest available apparent visible wavelength (AVW) data for 2025 and 2026, displayed side by side on two Pacific Ocean globes. Ocean colors range from blue, indicating lower phytoplankton concentrations, to green and yellow, indicating higher concentrations. The image is automatically updated as new satellite data becomes available, providing an ongoing comparison of ocean conditions between the two years."
+    }
+  ]
+}
