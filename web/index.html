@@ -1,0 +1,4490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="api-base" content="" />
+  <title>THESOUND.EARTH</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23060a12' stroke='%2338bdf8' stroke-width='6'/%3E%3Cpath d='M20 50 Q35 25 50 50 T80 50' fill='none' stroke='%2338bdf8' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%2338bdf8'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --border: rgba(255, 255, 255, 0.10);
+      --border-bright: rgba(255, 255, 255, 0.22);
+      --text: #f4f4f5;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-subtle: rgba(56, 189, 248, 0.15);
+      --card-bg: rgba(10, 14, 22, 0.88);
+      --dock-h: 110px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.22) rgba(10, 14, 22, 0.6);
+    }
+
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 14, 22, 0.6);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.38);
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #020409;
+      color: var(--text);
+    }
+
+    #globeViz {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      cursor: crosshair;
+      transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.panel-maximized #globeViz {
+      left: 50vw;
+      width: 50vw;
+    }
+
+    .watermark {
+      position: fixed;
+      top: 22px;
+      left: 26px;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s, left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .watermark:hover {
+      opacity: 1;
+    }
+
+    body.panel-maximized .watermark {
+      display: none !important;
+    }
+
+    body.panel-maximized .vis-switch {
+      max-width: calc(50vw - 32px);
+    }
+
+    .wm-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.45);
+      display: grid;
+      place-items: center;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .wm-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .vis-switch {
+      position: fixed;
+      top: 22px;
+      right: 26px;
+      z-index: 25;
+      display: flex;
+      background: rgba(10, 12, 18, 0.82);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .vis-switch button {
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .vis-switch button:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .vis-switch button.active {
+      background: #23252d;
+      color: var(--text);
+    }
+
+    .vis-switch button.catalog-trigger {
+      color: #7dd3fc;
+      border-left: 1px solid var(--border);
+      border-radius: 0 7px 7px 0;
+    }
+
+    .ocean-card {
+      position: fixed;
+      top: 72px;
+      right: 340px;
+      z-index: 20;
+      width: 340px;
+      max-height: calc(100vh - 160px);
+      overflow-y: auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: none;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+    }
+
+    .ocean-card.open {
+      display: block;
+    }
+
+    .oc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .oc-name {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .oc-sub {
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .oc-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .oc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .oc-stat {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 6px 8px;
+    }
+
+    .oc-stat .lbl {
+      font-size: 9.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .oc-stat .val {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 2px;
+      font-family: ui-monospace, monospace;
+    }
+
+    .oc-section {
+      margin-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding-top: 7px;
+    }
+
+    .oc-sec-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .oc-sec-content {
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .oc-cultural-frame {
+      font-size: 10.5px;
+      color: #94a3b8;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    .oc-note {
+      font-size: 11px;
+      color: #cbd5e1;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .oc-brief {
+      font-size: 11px;
+      color: #7dd3fc;
+      margin-top: 8px;
+      line-height: 1.45;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 8px;
+    }
+
+    .flow-boxes {
+      position: fixed;
+      top: 72px;
+      right: 26px;
+      z-index: 20;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .viz-box {
+      background: rgba(10, 14, 22, 0.78);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    .viz-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .viz-head span:last-child {
+      color: var(--accent);
+      font-family: ui-monospace, monospace;
+      text-transform: none;
+    }
+
+    .viz-box canvas {
+      width: 100%;
+      height: 82px;
+      display: block;
+      border-radius: 8px;
+      background: rgba(4, 7, 13, 0.7);
+    }
+
+    /* Bottom Dock with Year Selector */
+    .bottom-dock {
+      position: fixed;
+      left: 24px;
+      right: 24px;
+      bottom: 16px;
+      z-index: 20;
+      background: rgba(10, 12, 18, 0.76);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.panel-maximized .bottom-dock {
+      left: calc(50vw + 24px);
+    }
+
+    /* Year Selector Bar (Requirement 3) */
+    .tl-year-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .tl-year-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .tl-year-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .tl-year-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .tl-year-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .tl-year-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .timeline-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .tl-date {
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--accent);
+      min-width: 90px;
+    }
+
+    .tl-track {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tl-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .tl-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid var(--accent);
+      cursor: grab;
+    }
+
+    .tl-months {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.42);
+      user-select: none;
+    }
+
+    .transport-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 30px;
+      gap: 12px;
+    }
+
+    .timer {
+      font-family: ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .timer span {
+      color: var(--muted);
+    }
+
+    .track-name {
+      font-size: 12px;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .ctrl-btn {
+      background: none;
+      border: none;
+      color: #e4e4e7;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 4px;
+      opacity: 0.85;
+    }
+
+    .ctrl-btn:hover {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    .ctrl-btn svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .right-tools {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .ab-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .ab-toggle button {
+      width: 26px;
+      height: 22px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ab-toggle button.active {
+      background: #27272f;
+      color: var(--text);
+    }
+
+    /* UNIFIED LEFT PANEL: SOUNDSCAPES + EVIDENCE */
+    #leftPanel {
+      position: fixed;
+      top: 68px;
+      left: 26px;
+      z-index: 30;
+      bottom: calc(var(--dock-h, 110px) + 24px);
+      width: min(440px, calc(100vw - 32px));
+      max-height: calc(100vh - var(--dock-h, 110px) - 92px);
+      background: var(--card-bg);
+      backdrop-filter: blur(22px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.3s, border-radius 0.3s, top 0.3s, left 0.3s, bottom 0.3s;
+    }
+
+    #leftPanel.closed {
+      display: none;
+    }
+
+    #leftPanel.maximized {
+      top: 0 !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      width: 50vw !important;
+      min-width: 500px !important;
+      max-height: 100vh !important;
+      height: 100vh !important;
+      border-radius: 0 !important;
+      border-top: none !important;
+      border-bottom: none !important;
+      border-left: none !important;
+      border-right: 1px solid var(--border) !important;
+      z-index: 35 !important;
+    }
+
+    .panel-top-bar {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-sub {
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .panel-window-controls {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .p-win-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      width: 26px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .p-win-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Navigation tabs inside merged left panel */
+    .panel-tabs {
+      flex-shrink: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+
+    .panel-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .panel-tab-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.15s;
+    }
+
+    .panel-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .panel-tab-btn.active {
+      background: #23252d;
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .panel-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 4px;
+    }
+
+    .panel-view {
+      display: none;
+    }
+
+    .panel-view.active {
+      display: block;
+    }
+
+    /* Minimized Floating Pill */
+    #minimizedPill {
+      position: fixed;
+      top: 72px;
+      left: 26px;
+      z-index: 25;
+      background: rgba(10, 14, 22, 0.88);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    #minimizedPill:hover {
+      border-color: var(--accent);
+    }
+
+    #minimizedPill.show {
+      display: flex;
+    }
+
+    .rule-note {
+      font-size: 11px;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .track-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      transition: 0.18s;
+      cursor: pointer;
+    }
+
+    .track-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    .track-card.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.09);
+    }
+
+    .tc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .tc-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .tc-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .track-card.active .tc-badge {
+      background: var(--accent);
+      color: #020409;
+    }
+
+    .tc-meta {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      font-family: ui-monospace, monospace;
+    }
+
+    .tc-section-badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 6px;
+      padding: 3px 8px;
+      margin-top: 7px;
+    }
+
+    .tc-visual {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    .tc-visual a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .tc-visual a:hover {
+      text-decoration: underline;
+    }
+
+    .tc-visual small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    /* Evidence Tables inside Left Panel */
+    .table-container {
+      max-height: calc(100vh - var(--dock-h, 110px) - 260px);
+      min-height: 240px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(4, 7, 13, 0.7);
+      margin-top: 10px;
+    }
+
+    .audit-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: left;
+    }
+
+    .audit-table th {
+      position: sticky;
+      top: 0;
+      background: #0f172a;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    .audit-table td {
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: ui-monospace, monospace;
+      white-space: nowrap;
+    }
+
+    .audit-table tr.active-bar {
+      background: rgba(56, 189, 248, 0.22) !important;
+      border-left: 3px solid var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin-top: 8px;
+    }
+
+    .spec-table th {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px 10px;
+      text-align: left;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      font-size: 10.5px;
+    }
+
+    .spec-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    .spec-table code {
+      color: #7dd3fc;
+      font-family: ui-monospace, monospace;
+      font-size: 10.5px;
+    }
+
+    .limits-box {
+      background: rgba(245, 158, 11, 0.06);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 12px 0 16px 0;
+      color: #fde68a;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .limits-box strong {
+      color: #fff;
+    }
+
+    .limits-list {
+      list-style: square;
+      margin-left: 18px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    /* SVS Catalog UX Fixes */
+    #svsCatalog {
+      position: fixed;
+      z-index: 40;
+      top: 68px;
+      right: 26px;
+      width: min(680px, calc(100vw - 32px));
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(8, 12, 20, 0.96);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+      display: none;
+    }
+
+    #svsCatalog.open {
+      display: block;
+    }
+
+    #svsCatalog h2 {
+      font-size: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #svsCatalog input,
+    #svsCatalog select {
+      color: var(--text);
+      background: #111a26;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px;
+    }
+
+    #svsCatalog input[type=search] {
+      width: 100%;
+    }
+
+    .svs-row {
+      display: flex;
+      gap: 8px;
+      margin: 9px 0;
+    }
+
+    .svs-button {
+      background: #122334;
+      border: 1px solid #31516b;
+      color: #e0f2fe;
+      border-radius: 7px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: 0.15s;
+    }
+
+    .svs-button:hover:not(:disabled) {
+      background: #1a324a;
+      border-color: var(--accent);
+    }
+
+    .svs-button:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    .svs-button.primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .svs-button.primary:hover:not(:disabled) {
+      background: #0369a1;
+    }
+
+    #svsPinnedSelection {
+      display: none;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    #svsPinnedSelection.open {
+      display: block;
+    }
+
+    #svsPinnedSelection h3 {
+      font-size: 13.5px;
+      color: #7dd3fc;
+      margin-bottom: 6px;
+    }
+
+    #svsPinnedSelection p {
+      font-size: 11.5px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+
+    #svsPinnedSelection video {
+      width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      background: #000;
+      margin: 6px 0;
+    }
+
+    #svsResults {
+      display: grid;
+      gap: 7px;
+      margin: 10px 0;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .svs-result {
+      display: block;
+      width: 100%;
+      text-align: left;
+      color: var(--text);
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .svs-result:hover {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .svs-result small {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 11px;
+    }
+
+    #svsStatus {
+      min-height: 20px;
+      color: #7dd3fc;
+      font-size: 12px;
+      margin: 8px 0;
+    }
+
+    #svsProgress {
+      width: 100%;
+      height: 5px;
+      accent-color: var(--accent);
+    }
+
+    #svsStickyBar {
+      position: sticky;
+      bottom: -18px;
+      margin: 12px -18px -18px -18px;
+      padding: 12px 18px;
+      background: rgba(8, 12, 20, 0.98);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 5;
+    }
+
+    /* Mobile Responsive Full-screen */
+    @media (max-width: 768px) {
+      #svsCatalog {
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 16px !important;
+        z-index: 50 !important;
+      }
+
+      #leftPanel {
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        max-height: 100vh !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 16px !important;
+        transform: none !important;
+        z-index: 50 !important;
+      }
+
+      .bottom-dock {
+        left: 8px !important;
+        right: 8px !important;
+        bottom: 8px !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+        gap: 4px !important;
+      }
+
+      .tl-year-bar {
+        padding-bottom: 4px !important;
+      }
+
+      .tl-year-lbl {
+        display: none !important;
+      }
+
+      .tl-months {
+        display: none !important;
+      }
+
+      .watermark {
+        display: none !important;
+      }
+
+      .vis-switch {
+        top: 8px !important;
+        right: 8px !important;
+        padding: 2px !important;
+      }
+
+      .vis-switch button {
+        padding: 4px 8px !important;
+        font-size: 10px !important;
+      }
+    }
+
+    /* Voice Guidance Accessibility Modal & Controls */
+    .voice-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #000000 !important;
+      opacity: 1.0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .voice-modal.hidden {
+      display: none !important;
+    }
+
+    .voice-modal-card {
+      background: #090d16;
+      border: 2px solid #38bdf8;
+      border-radius: 18px;
+      padding: 24px 28px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.25);
+      color: #f4f4f5;
+      text-align: left;
+    }
+
+    .voice-modal-card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .voice-modal-card p {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .voice-modal-card kbd {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-family: ui-monospace, monospace;
+      color: #38bdf8;
+    }
+
+    .voice-modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-voice-primary {
+      background: #38bdf8;
+      color: #020409;
+      border: none;
+      border-radius: 9px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn-voice-primary:hover {
+      background: #7dd3fc;
+    }
+
+    .btn-voice-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn-voice-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    /* Listening Microphone Indicator */
+    .mic-indicator {
+      position: fixed;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.94);
+      border: 2px solid #ef4444;
+      border-radius: 30px;
+      padding: 8px 20px;
+      color: #fecaca;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 50;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.65);
+    }
+
+    .mic-indicator.active {
+      display: flex;
+      animation: micPulse 1.2s infinite;
+    }
+
+    .mic-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+
+    @keyframes micPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.45);
+      }
+
+      50% {
+        box-shadow: 0 0 35px rgba(239, 68, 68, 0.9);
+      }
+    }
+
+    /* Backend Warmup Delay Notice */
+    .warmup-notice {
+      position: fixed;
+      top: 72px;
+      left: 26px;
+      z-index: 24;
+      background: rgba(10, 14, 22, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #7dd3fc;
+      display: none;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .warmup-notice.show {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    window.activateVoiceGuidance = function (enable) {
+      const modal = document.getElementById('voiceModal');
+      if (modal) {
+        modal.style.opacity = '0';
+        setTimeout(() => modal.classList.add('hidden'), 280);
+      }
+      window.__pendingVoiceGuidance = enable;
+    };
+  </script>
+
+  <!-- Accessible Voice Guidance Modal (Step 2.1) -->
+  <div id="voiceModal" class="voice-modal" role="dialog" aria-modal="true" aria-labelledby="voiceModalTitle">
+    <div class="voice-modal-card">
+      <h2 id="voiceModalTitle"><span>🎙️</span> Enable Voice Assistance?</h2>
+      <p>
+        Navigate Earth observation soundscapes completely hands-free.
+        Press <kbd>[Enter]</kbd> for Yes, or <kbd>[Esc]</kbd> for No.<br /><br />
+        Hold <kbd>[Spacebar]</kbd> to speak: <em>"Go to UAE"</em>, <em>"Fly to London"</em>, <em>"Explain more"</em>, or
+        <em>"Pause"</em>.<br /><br />
+        <strong>To generate music from NASA visualizations, say search followed by a topic, then say pair with
+          visual.</strong>
+      </p>
+      <div class="voice-modal-actions">
+        <button id="btnVoiceNo" class="btn-voice-secondary" onclick="activateVoiceGuidance(false)">No [Esc]</button>
+        <button id="btnVoiceYes" class="btn-voice-primary" onclick="activateVoiceGuidance(true)">Yes, Enable
+          [Enter]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Red Glowing Microphone Indicator (Step 2.1) -->
+  <div id="micIndicator" class="mic-indicator" role="alert">
+    <span class="mic-dot"></span>
+    <span>LISTENING… (Release Spacebar to send)</span>
+  </div>
+
+  <!-- Warm-up Delay Status Text (Step 2.4) -->
+  <div id="warmupNotice" class="warmup-notice" role="status">
+    <span>⏳</span> Warming up acoustic models…
+  </div>
+
+  <div id="globeViz"></div>
+
+  <div class="watermark" onclick="resetGlobe()" title="Reset Globe View">
+    <div class="wm-mark">SE</div>
+    <div class="wm-title">THESOUND.EARTH</div>
+  </div>
+
+  <div class="vis-switch">
+    <button class="active" id="visOsc" onclick="setVisualMode('oscar')">OSCAR Flow</button>
+    <button id="visSvs" onclick="setVisualMode('svs')">SVS 3912</button>
+    <button id="btnToggleLeft" class="active" onclick="toggleLeftPanel()">Soundscapes &amp; Evidence</button>
+    <button class="catalog-trigger" id="openSvsCatalog" type="button">NASA SVS</button>
+  </div>
+
+  <!-- Minimized Floating Pill -->
+  <div id="minimizedPill" onclick="restoreLeftPanel()">
+    <span>▶ Soundscapes &amp; Evidence</span>
+  </div>
+
+  <!-- UNIFIED LEFT PANEL (Requirement 6) -->
+  <aside id="leftPanel" class="open" aria-label="Gulf Stream Soundscapes and Evidence">
+    <div class="panel-top-bar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="wm-mark" style="width:24px; height:24px; font-size:10px;">SE</div>
+        <div>
+          <div class="panel-title">THESOUND.EARTH</div>
+          <div class="panel-sub">Gulf Stream Sonification &amp; Evidence</div>
+        </div>
+      </div>
+      <div class="panel-window-controls">
+        <button class="p-win-btn" id="btnMaxPanel" onclick="toggleMaximizePanel()"
+          title="Maximize to 50% width / Restore">⛶</button>
+        <button class="p-win-btn" onclick="minimizeLeftPanel()" title="Minimize to pill">–</button>
+        <button class="p-win-btn" onclick="closeLeftPanel()" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- Panel Navigation Tabs -->
+    <div class="panel-tabs">
+      <button class="panel-tab-btn active" onclick="switchPanelView('viewTracks')">Tracks</button>
+      <button class="panel-tab-btn" onclick="switchPanelView('viewAudit')">Data to Bar</button>
+      <button class="panel-tab-btn" onclick="switchPanelView('viewRules')">Mapping Rules</button>
+      <button class="panel-tab-btn" onclick="switchPanelView('viewLimits')">Honest Limits</button>
+      <button class="panel-tab-btn" onclick="switchPanelView('viewSources')">Sources &amp; Credits</button>
+    </div>
+
+    <div class="panel-body">
+      <!-- Tab 1: Tracks List -->
+      <div class="panel-view active" id="viewTracks">
+        <div class="rule-note">
+          Every note is computed from the data by rules we chose. FluidSynth pre-rendered audio.
+        </div>
+        <div class="track-list" id="trackListContainer"></div>
+      </div>
+
+      <!-- Tab 2: From Data to Bar Audit Table -->
+      <div class="panel-view" id="viewAudit">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:11px; color:var(--muted);">Current playing bar is highlighted in real time.</span>
+          <select id="auditTrackSelect" onchange="loadAuditForSelectedTrack()"
+            style="background:#111a26; color:#f4f4f5; border:1px solid var(--border); border-radius:6px; padding:4px 8px; font-size:11px;">
+            <option value="2025">2025 Full Year (Gm, 53 bars)</option>
+            <option value="2025-01">2025-01 Month (Em, 31 bars)</option>
+            <option value="2026-01">2026-01 Month (F#m, 16 bars)</option>
+            <option value="2024">2024 Full Year (F#m, 53 bars)</option>
+            <option value="2023">2023 Full Year (Abm, 53 bars)</option>
+          </select>
+        </div>
+
+        <div class="table-container" id="auditTableContainer">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Bar</th>
+                <th>Dates</th>
+                <th>Days</th>
+                <th>p95 Spd</th>
+                <th>Norm</th>
+                <th>Sector</th>
+                <th>Ageo Mag</th>
+                <th>Held?</th>
+                <th>Chord</th>
+                <th>Drums</th>
+                <th>Melody</th>
+                <th>Vel</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: How Data Becomes Sound Mapping Rules -->
+      <div class="panel-view" id="viewRules">
+        <div style="font-size:12px; font-weight:600; color:#fff; margin-bottom:4px;">How Data Becomes Sound</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Deterministic mapping from physical ocean
+          parameters to acoustic structures</div>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Physical Feature</th>
+              <th>Scientific Parameter</th>
+              <th>Acoustic Rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Period Mean Speed</strong></td>
+              <td>Mean 95th-percentile surface speed over period</td>
+              <td><strong>Key transposition</strong> <code>k = round(6 * (mean_speed - lo) / (hi - lo))</code> semitones
+                above D. Clamped 0..6. Last bar resolves to tonic minor.</td>
+            </tr>
+            <tr>
+              <td><strong>Ageostrophic Flow</strong></td>
+              <td>Non-geostrophic wind-driven flow vector decomposed into 4 quadrants</td>
+              <td><strong>Harmonic chord progression</strong>: North (i), East (VI), South (iv), West (VII). Peak
+                section introduces III lift; Calm section introduces v.</td>
+            </tr>
+            <tr>
+              <td><strong>Ageostrophic Magnitude</strong></td>
+              <td>Current shear energy threshold (&lt; 0.013 m/s)</td>
+              <td><strong>Harmonic Hold</strong>: When energy drops below threshold, previous chord is sustained to
+                prevent artificial churn during slack water.</td>
+            </tr>
+            <tr>
+              <td><strong>Block Speed (p95)</strong></td>
+              <td>Current speed normalized over bounds [0, 1]</td>
+              <td><strong>Dynamics &amp; Drums</strong>: Velocity scaling (0.65..1.05) and drum groove tier switching
+                (Low &lt; 0.35, Mid 0.35..0.70, High &gt; 0.70).</td>
+            </tr>
+            <tr>
+              <td><strong>Calendar Block</strong></td>
+              <td>7-day aggregated blocks (yearly) or 1-day increments (monthly)</td>
+              <td><strong>1 block = 1 musical bar</strong> at 72 BPM (4 beats per bar, 3.333s per block).</td>
+            </tr>
+            <tr>
+              <td><strong>Period SHA-256 Hash</strong></td>
+              <td>Digest of period label ("2025" or "2025-01")</td>
+              <td><strong>Melodic Seed</strong>: Deterministic melody contour. Beats 1 and 3 remain strict chord tones.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tab 4: Honest Limits -->
+      <div class="panel-view" id="viewLimits">
+        <div style="font-size:12px; font-weight:600; color:#fff; margin-bottom:4px;">Honest Limits &amp; Boundaries
+        </div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Explicit scientific boundaries and
+          deliberate modeling choices</div>
+
+        <div class="limits-box">
+          <strong>"Every note is computed from the data by rules we chose."</strong>
+          <ul class="limits-list">
+            <li><strong>Data Encoding, Not Underwater Audio:</strong> This music sonifies numerical physical values
+              derived from satellite data. It is not an audio recording of ocean waves, underwater hydrophones, or
+              marine life.</li>
+            <li><strong>15 Calibrated Regions:</strong> Sonification pipelines are calibrated across 15 global regions
+              (7 ocean basins + 8 land wildfire/canopy transects). Clicking the globe snaps to the nearest calibrated
+              region.</li>
+            <li><strong>2026 Temporal Coverage:</strong> Satellite ocean current data for 2026 ends on 16 Jan.
+              Subsequent periods are awaiting satellite processing and calibration.</li>
+            <li><strong>Excluded Earth Domains:</strong> Terrestrial vegetation, atmospheric CO2 concentrations, and
+              meteorological wind speeds are not coupled into this sonification engine.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tab 5: Sources & AI Credits -->
+      <div class="panel-view" id="viewSources">
+        <div style="font-size:12px; font-weight:600; color:#fff; margin-bottom:4px;">Data Sources &amp; AI Credits</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Provenance, data providers, and system
+          attributions</div>
+        <div style="font-size:11.5px; line-height:1.55; color:#cbd5e1; display:flex; flex-direction:column; gap:10px;">
+          <div
+            style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+            <strong style="color:#fff;">NASA PO.DAAC OSCAR Data</strong><br />
+            Ocean Surface Current Analysis Real-time (OSCAR_L4_OC_FINAL_V2.0), 0.25° daily resolution. Derived from
+            satellite altimetry and scatterometry.<br />
+            DOI: <a href="https://doi.org/10.5067/OSCAR-25F20" target="_blank" rel="noopener"
+              style="color:var(--accent);">10.5067/OSCAR-25F20</a>
+          </div>
+          <div
+            style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+            <strong style="color:#fff;">NASA Goddard Scientific Visualization Studio (SVS)</strong><br />
+            SVS 3912 ("Perpetual Ocean", ECCO2 surface current flow model by Horace Mitchell). NASA Earth Information
+            Center (EIC) integration.
+          </div>
+          <div
+            style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+            <strong style="color:#fff;">AI Use &amp; Audio Credits</strong><br />
+            - Algorithmic sonification architecture and rule engine designed with Antigravity AI.<br />
+            - Oceanographic context and briefings supported by Google Gemini API.<br />
+            - Audio rendering powered by FluidSynth with the open-source FluidR3_GM SoundFont.
+          </div>
+        </div>
+      </div>
+    </div> <!-- end .panel-body -->
+  </aside>
+
+  <!-- NASA SVS Search UX (STEP 3 & 5) -->
+  <section id="svsCatalog" aria-labelledby="svsHeading">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 id="svsHeading" style="margin:0;">NASA Earth Information Center (SVS)</h2>
+      <button class="drawer-close" onclick="toggleSvsCatalog()">✕</button>
+    </div>
+
+    <!-- Pinned Selection at Top -->
+    <div id="svsPinnedSelection">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <h3 id="pinnedTitle">Selected Visualization</h3>
+        <span id="pinnedBadge" style="font-size:10px; color:var(--accent); font-family:ui-monospace, monospace;">ID
+          —</span>
+      </div>
+      <div id="pinnedMedia"></div>
+      <p id="pinnedDesc"></p>
+      <div id="pinnedMeta" style="font-size:11px; color:var(--muted); font-family:ui-monospace, monospace;"></div>
+    </div>
+
+    <div class="svs-row">
+      <input id="svsSearch" type="search" aria-label="Search NASA SVS visualizations"
+        placeholder="Search ocean, currents, atmosphere..." />
+      <button class="svs-button" id="svsSearchButton">Search</button>
+    </div>
+    <label style="font-size:12px; color:var(--muted);"><input type="checkbox" id="svsEicOnly" checked /> Prioritize
+      Earth Information Center (EIC) visualizations</label>
+
+    <div id="svsResults" role="region" aria-atomic="true"></div>
+
+    <div class="svs-row" style="justify-content:space-between;">
+      <button class="svs-button" id="svsPrevious" disabled>Previous</button>
+      <button class="svs-button" id="svsNext" disabled>Next</button>
+    </div>
+
+    <div id="svsStatus" role="status" aria-atomic="true"></div>
+    <div id="svsFrameBadge" style="margin-top:6px; font-size:11px; color:var(--accent); font-family:ui-monospace, monospace; font-weight:600;" hidden></div>
+    <progress id="svsProgress" max="1" value="0" aria-label="NASA frame processing progress"></progress>
+
+    <!-- Sticky Play/Pair Bottom Bar -->
+    <div id="svsStickyBar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <label style="font-size:11.5px; color:var(--muted);">Sample every
+          <select id="svsSampleEvery" aria-label="Frame sampling frequency" style="padding:4px 6px; font-size:11px;">
+            <option value="1">1 frame</option>
+            <option value="4" selected>4 frames</option>
+            <option value="10">10 frames</option>
+            <option value="30">30 frames</option>
+          </select>
+        </label>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="svs-button" id="svsPairButton" onclick="pairSelectedSvsWithSoundscape()">Pair with
+          Visual</button>
+        <button class="svs-button primary" id="svsGenerate" disabled>Generate Sound</button>
+        <button class="svs-button" id="svsCancel" hidden>Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="ocean-card" id="oceanCard">
+    <div class="oc-header">
+      <div>
+        <div class="oc-name" id="ocName">Region Selection</div>
+        <div class="oc-sub" id="ocCoords">Click globe to snap</div>
+      </div>
+      <button class="oc-close" onclick="document.getElementById('oceanCard').classList.remove('open')">✕</button>
+    </div>
+    <div class="oc-grid">
+      <div class="oc-stat">
+        <div class="lbl">Tempo</div>
+        <div class="val" id="ocTempo">—</div>
+      </div>
+      <div class="oc-stat">
+        <div class="lbl">Scale / Key</div>
+        <div class="val" id="ocScale">—</div>
+      </div>
+      <div class="oc-stat">
+        <div class="lbl">Bars</div>
+        <div class="val" id="ocBars">—</div>
+      </div>
+      <div class="oc-stat">
+        <div class="lbl">Duration</div>
+        <div class="val" id="ocDuration">—</div>
+      </div>
+    </div>
+    <!-- Scientific Data & Audit Summary -->
+    <div class="oc-section" id="ocScientificSection">
+      <div class="oc-sec-title">Scientific Data &amp; Audit Summary</div>
+      <div class="oc-sec-content" id="ocScientificSummary">Loading satellite dataset information…</div>
+    </div>
+    <!-- Facts Narrative -->
+    <div class="oc-section" id="ocFactsSection">
+      <div class="oc-sec-title">Facts Narrative</div>
+      <div class="oc-sec-content" id="ocFacts"></div>
+    </div>
+    <!-- Story & Cultural Frame -->
+    <div class="oc-section" id="ocStorySection">
+      <div class="oc-sec-title" id="ocStoryLabel">Story &amp; Cultural Frame</div>
+      <div class="oc-sec-content" id="ocStory"></div>
+      <div class="oc-cultural-frame" id="ocCulturalFrame"></div>
+    </div>
+    <!-- Honest Limits & AI Disclosure -->
+    <div class="oc-section" id="ocLimitsSection">
+      <div class="oc-sec-title">Honest Limits &amp; AI Disclosure</div>
+      <div class="oc-sec-content" id="ocLimits"></div>
+    </div>
+    <div class="oc-note" id="ocNote" style="display:none;"></div>
+    <div class="oc-brief" id="ocBrief" style="display:none;"></div>
+  </div>
+
+  <aside class="flow-boxes open" id="flowBoxes">
+    <div class="viz-box">
+      <div class="viz-head"><span>Global Speed &amp; Local Flow</span><span id="lblFlow">Flow</span></div>
+      <canvas id="cFlow" width="276" height="82"></canvas>
+    </div>
+    <div class="viz-box">
+      <div class="viz-head"><span>Velocity (u / v / speed)</span><span id="lblVel">m/s</span></div>
+      <canvas id="cVel" width="276" height="82"></canvas>
+    </div>
+    <div class="viz-box">
+      <div class="viz-head"><span>Audio Spectrum</span><span id="lblAudio">Active</span></div>
+      <canvas id="cAudio" width="276" height="82"></canvas>
+    </div>
+  </aside>
+
+  <footer class="bottom-dock" id="bottomDock">
+    <!-- Year Selector above Slider (Requirement 3) -->
+    <div class="tl-year-bar">
+      <span class="tl-year-lbl">DATASET YEAR</span>
+      <div class="tl-year-buttons" id="yearBtnGroup">
+        <button class="tl-year-btn" onclick="selectTimelineYear('2021')">2021</button>
+        <button class="tl-year-btn" onclick="selectTimelineYear('2022')">2022</button>
+        <button class="tl-year-btn" onclick="selectTimelineYear('2023')">2023</button>
+        <button class="tl-year-btn" onclick="selectTimelineYear('2024')">2024</button>
+        <button class="tl-year-btn active" onclick="selectTimelineYear('2025')">2025</button>
+        <button class="tl-year-btn" onclick="selectTimelineYear('2026')">2026</button>
+      </div>
+    </div>
+
+    <div class="timeline-wrap" id="timelineWrap" title="Drag or scroll mouse wheel to scrub through the year">
+      <div class="tl-date" id="tlDate">2025-01-01</div>
+      <div class="tl-track">
+        <input type="range" min="0" max="364" value="0" class="tl-slider" id="yearSlider" />
+        <div class="tl-months">
+          <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+          <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; min-width:130px;">
+        <span class="tl-date" id="tlHour" style="min-width:48px;">12:00</span>
+        <input type="range" min="0" max="23" value="12" class="tl-slider" id="hourSlider" style="width:70px;" />
+      </div>
+    </div>
+
+    <div class="transport-row">
+      <div class="timer" id="timer">00:00 <span>/ 00:00</span></div>
+      <div class="track-name" id="trackLabel">Click any region on the globe or select a track to listen</div>
+
+      <div class="controls">
+        <button class="ctrl-btn" onclick="seek(-3)"><svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z" />
+          </svg></button>
+        <button class="ctrl-btn" onclick="seek(3)"><svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z" />
+          </svg></button>
+        <button class="ctrl-btn" onclick="restartAudio()"><svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+          </svg></button>
+        <button class="ctrl-btn" id="playPauseBtn" onclick="togglePlay()"><svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg></button>
+        <button class="ctrl-btn" onclick="stopAudio()"><svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" />
+          </svg></button>
+        <button class="ctrl-btn" id="loopBtn" onclick="toggleLoop()"><svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <path d="M17 2l4 4-4 4" />
+            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+            <path d="M7 22l-4-4 4-4" />
+            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+          </svg></button>
+      </div>
+
+      <div class="right-tools">
+        <button class="ctrl-btn" onclick="downloadFile('json')" title="Download Audit JSON"><svg viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg></button>
+        <button class="ctrl-btn" onclick="downloadFile('wav')" title="Download Audio"><svg viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg></button>
+        <div class="ab-toggle">
+          <button class="active" id="btnA" onclick="switchMode('musical')">A</button>
+          <button id="btnB" onclick="switchMode('diagnostic')">B</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <audio id="audioEl" crossorigin="anonymous"></audio>
+  <audio id="kokoroVoicePlayer" crossorigin="anonymous"></audio>
+  <video id="svsVideo" src="ecco2_small.mp4" loop muted playsinline crossorigin="anonymous"
+    style="display:none;"></video>
+
+  <script type="module">
+
+    const STATIC_MODE = false;
+    const API_BASE = document.querySelector('meta[name="api-base"]')?.content || (typeof localStorage !== 'undefined' ? localStorage.getItem('API_BASE') : '') || '';
+    window.API_BASE = API_BASE;
+
+    import * as THREE from 'https://esm.sh/three@0.170.0';
+    import { OrbitControls } from 'https://esm.sh/three@0.170.0/examples/jsm/controls/OrbitControls.js';
+
+    let selectedDoy = 0, selectedHour = 12, currentVisualMode = 'oscar';
+    let currentMode = 'musical', lastCoords = null;
+    let gridSnapshot = [], availableDates = [];
+    let flowU = 0.2, flowV = 0.1, flowSpeed = 0.22;
+
+    let soundscapeTracks = [];
+    let currentTrackId = 'gulf_stream';
+    let currentMeta = null;
+    let currentAuditData = null;
+    let currentAuditTrackId = null;
+    let isPanelMaximized = false;
+
+    // Daily Oscar Records (Requirement 3 & 4)
+    let selectedYear = '2025';
+    let dailyRecords = [];
+
+    // SVS Catalog Variables
+    let svsOffset = 0, svsCount = 0, selectedSvs = null, svsJob = null, svsPoll = null;
+
+    const container = document.getElementById('globeViz');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0.5, 2.7);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.minDistance = 1.25;
+    controls.maxDistance = 5.0;
+
+    function getSunDir(doy, hourUtc) {
+      const decl = -23.44 * Math.cos((2 * Math.PI / 365) * (doy + 10)) * (Math.PI / 180);
+      const lon = (12 - hourUtc) * 15 * (Math.PI / 180);
+      return new THREE.Vector3(Math.cos(decl) * Math.sin(lon), Math.sin(decl), Math.cos(decl) * Math.cos(lon)).normalize();
+    }
+    function getSeasonFactor(doy) { return -Math.cos((2 * Math.PI / 365) * (doy + 10)); }
+
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+    const dayTex = loader.load('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg');
+    const nightTex = loader.load('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg');
+
+    const earthMat = new THREE.ShaderMaterial({
+      uniforms: { dayTex: { value: dayTex }, nightTex: { value: nightTex }, sunDir: { value: getSunDir(0, 12) }, season: { value: getSeasonFactor(0) } },
+      vertexShader: `varying vec2 vUv; varying vec3 vNorm; varying vec3 vViewDir; varying float vLat;
+        void main(){ vUv=uv; vLat=position.y; vec4 wp=modelMatrix*vec4(position,1.0); vNorm=normalize(mat3(modelMatrix)*normal); vViewDir=normalize(cameraPosition-wp.xyz); gl_Position=projectionMatrix*viewMatrix*wp; }`,
+      fragmentShader: `uniform sampler2D dayTex; uniform sampler2D nightTex; uniform vec3 sunDir; uniform float season; varying vec2 vUv; varying vec3 vNorm; varying vec3 vViewDir; varying float vLat;
+        void main(){ vec3 N=normalize(vNorm); float sunDot=dot(N,normalize(sunDir)); float dayMix=smoothstep(-0.18,0.22,sunDot);
+          vec3 dayCol=texture2D(dayTex,vUv).rgb; float isLand=smoothstep(0.02,0.14,dayCol.r+dayCol.g-dayCol.b*1.1);
+          float snowMask=isLand*clamp(clamp(-season,0.0,1.0)*smoothstep(0.55,0.88,vLat)+clamp(season,0.0,1.0)*smoothstep(-0.55,-0.88,vLat),0.0,0.85);
+          dayCol=mix(dayCol,vec3(0.88,0.93,0.98),snowMask); vec3 nightCol=texture2D(nightTex,vUv).rgb*1.25;
+          float fresnel=pow(1.0-max(dot(N,normalize(vViewDir)),0.0),3.2);
+          gl_FragColor=vec4(mix(nightCol,dayCol,dayMix)+vec3(0.28,0.62,1.0)*fresnel*(0.25+0.75*dayMix),1.0); }`
+    });
+    const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), earthMat);
+    scene.add(earthMesh);
+
+    // Coordinate to 3D sphere vector converter for region marker
+    function latLonToVec3(lat, lon, r = 1.003) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+      return new THREE.Vector3(
+        -r * Math.sin(phi) * Math.cos(theta),
+        r * Math.cos(phi),
+        r * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    const NUM_STREAMS = 2400, TOTAL_VERTS = NUM_STREAMS * 18;
+    const lineGeo = new THREE.BufferGeometry();
+    const posArr = new Float32Array(TOTAL_VERTS * 3), fadeArr = new Float32Array(TOTAL_VERTS), spdArr = new Float32Array(TOTAL_VERTS);
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+    lineGeo.setAttribute('aFade', new THREE.BufferAttribute(fadeArr, 1));
+    lineGeo.setAttribute('aSpeed', new THREE.BufferAttribute(spdArr, 1));
+    const lineMat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: `attribute float aFade; attribute float aSpeed; varying float vFade; varying float vSpeed; varying float vVisible;
+        void main(){ vFade=aFade; vSpeed=aSpeed; vec3 wp=(modelMatrix*vec4(position,1.0)).xyz; vVisible=step(-0.05,dot(normalize(wp),normalize(cameraPosition))); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+      fragmentShader: `varying float vFade; varying float vSpeed; varying float vVisible;
+        void main(){ if(vVisible<0.5) discard; gl_FragColor=vec4(mix(vec3(0.32,0.78,1.0),vec3(1.0),clamp(vSpeed*1.15,0.0,1.0)), vFade*(0.35+clamp(vSpeed*0.65,0.0,0.65))); }`
+    });
+    const streamMesh = new THREE.LineSegments(lineGeo, lineMat);
+    scene.add(streamMesh);
+
+    const svsVideo = document.getElementById('svsVideo');
+    let currentSvsVideoBlobUrl = null;
+    let currentSvsAudioBlobUrl = null;
+    let svsTexture = null;
+
+    if (svsVideo) {
+      svsVideo.crossOrigin = 'anonymous';
+      svsVideo.onerror = (e) => {
+        console.warn('svsVideo playback error, falling back to oscar:', e);
+        setVisualMode('oscar');
+        if (svsTexture) {
+          svsTexture.dispose();
+          svsTexture = null;
+        }
+      };
+      svsVideo.addEventListener('canplay', () => {
+        if (currentVisualMode === 'svs' && svsVideo && !svsVideo.error && svsVideo.videoWidth > 0) {
+          if (!svsTexture) {
+            svsTexture = new THREE.VideoTexture(svsVideo);
+            svsTexture.colorSpace = THREE.SRGBColorSpace;
+            svsTexture.minFilter = THREE.LinearFilter;
+            svsTexture.magFilter = THREE.LinearFilter;
+            svsTexture.generateMipmaps = false;
+          }
+          earthMesh.material = new THREE.MeshBasicMaterial({ map: svsTexture });
+          earthMesh.material.needsUpdate = true;
+          streamMesh.visible = false;
+          ringMesh.visible = false;
+        }
+      });
+    }
+
+    let svsPlayPromise = null;
+    function safePlaySvsVideo() {
+      if (!svsVideo) return;
+      svsPlayPromise = svsVideo.play();
+      if (svsPlayPromise !== undefined) {
+        svsPlayPromise.catch(err => {
+          if (err.name !== 'AbortError') console.warn('svsVideo play error:', err);
+        });
+      }
+    }
+
+    async function safePauseSvsVideo() {
+      if (!svsVideo) return;
+      if (svsPlayPromise !== null) {
+        try { await svsPlayPromise; } catch (_) {}
+        svsPlayPromise = null;
+      }
+      try { svsVideo.pause(); } catch (_) {}
+    }
+
+    let audioPlayPromise = null;
+    function safePlayAudio(targetAudio = audio) {
+      if (!targetAudio) return;
+      const src = targetAudio.currentSrc || targetAudio.src;
+      if (!src || src === window.location.href || src.endsWith('/') || targetAudio.error) {
+        return;
+      }
+      try {
+        const p = targetAudio.play();
+        if (targetAudio === audio) audioPlayPromise = p;
+        if (p !== undefined) {
+          p.catch(err => {
+            if (err.name !== 'AbortError' && err.name !== 'NotSupportedError') {
+              console.warn('audio play error:', err);
+            }
+          });
+        }
+      } catch (err) {
+        if (err.name !== 'NotSupportedError') {
+          console.warn('safePlayAudio exception:', err);
+        }
+      }
+    }
+
+    function showStatusNotice(message) {
+      const notice = document.getElementById('warmupNotice');
+      if (notice) {
+        notice.textContent = message;
+        notice.style.display = 'block';
+        setTimeout(() => { notice.style.display = 'none'; }, 4500);
+      }
+      const label = document.getElementById('trackLabel');
+      if (label && (!label.textContent || label.textContent.trim() === '')) {
+        label.textContent = message;
+      }
+    }
+
+    async function safePauseAudio() {
+      if (!audio) return;
+      if (audioPlayPromise !== null) {
+        try { await audioPlayPromise; } catch (_) {}
+        audioPlayPromise = null;
+      }
+      try { audio.pause(); } catch (_) {}
+    }
+
+    async function cleanupSvsBlobs() {
+      await safePauseSvsVideo();
+      if (svsVideo) {
+        svsVideo.removeAttribute('src');
+        svsVideo.load();
+      }
+      if (currentSvsVideoBlobUrl) {
+        URL.revokeObjectURL(currentSvsVideoBlobUrl);
+        currentSvsVideoBlobUrl = null;
+      }
+      if (currentSvsAudioBlobUrl) {
+        URL.revokeObjectURL(currentSvsAudioBlobUrl);
+        currentSvsAudioBlobUrl = null;
+      }
+      if (svsTexture) {
+        svsTexture.dispose();
+        svsTexture = null;
+      }
+    }
+
+    function setVisualMode(vis) {
+      currentVisualMode = vis;
+      document.getElementById('visOsc').classList.toggle('active', vis === 'oscar');
+      document.getElementById('visSvs').classList.toggle('active', vis === 'svs');
+      if (vis === 'svs') {
+        const canUseVideo = svsVideo && !svsVideo.error && svsVideo.readyState >= 2 && svsVideo.videoWidth > 0;
+        if (canUseVideo) {
+          if (!svsTexture) {
+            svsTexture = new THREE.VideoTexture(svsVideo);
+            svsTexture.colorSpace = THREE.SRGBColorSpace;
+            svsTexture.minFilter = THREE.LinearFilter;
+            svsTexture.magFilter = THREE.LinearFilter;
+            svsTexture.generateMipmaps = false;
+          }
+          earthMesh.material = new THREE.MeshBasicMaterial({ map: svsTexture });
+          earthMesh.material.needsUpdate = true;
+          streamMesh.visible = false;
+          ringMesh.visible = false;
+          safePlaySvsVideo();
+        } else {
+          earthMesh.material = earthMat;
+          earthMesh.material.needsUpdate = true;
+          streamMesh.visible = true;
+          safePlaySvsVideo();
+        }
+      } else {
+        earthMesh.material = earthMat; // Cleanly restores original Earth shader texture
+        earthMesh.material.needsUpdate = true;
+        streamMesh.visible = true;
+        safePauseSvsVideo();
+        cleanupSvsBlobs();
+      }
+    }
+
+    const worker = new Worker('/flow.worker.js');
+    worker.onmessage = (e) => {
+      const buf = e.data;
+      for (let i = 0; i < TOTAL_VERTS; i++) {
+        posArr[i * 3] = buf[i * 5]; posArr[i * 3 + 1] = buf[i * 5 + 1]; posArr[i * 3 + 2] = buf[i * 5 + 2];
+        fadeArr[i] = buf[i * 5 + 3]; spdArr[i] = buf[i * 5 + 4];
+      }
+      lineGeo.attributes.position.needsUpdate = true;
+      lineGeo.attributes.aFade.needsUpdate = true;
+      lineGeo.attributes.aSpeed.needsUpdate = true;
+    };
+
+    const MONTH_LABELS_12 = '<span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>';
+    const MONTH_LABELS_2026 = '<span>Jan 01</span><span>Jan 05</span><span>Jan 10</span><span>Jan 16</span>';
+
+    function updateSliderMonthLabels(year) {
+      const tlMonths = document.querySelector('.tl-months');
+      if (!tlMonths) return;
+      if (String(year) === '2026') {
+        tlMonths.innerHTML = MONTH_LABELS_2026;
+      } else {
+        tlMonths.innerHTML = MONTH_LABELS_12;
+      }
+    }
+
+    let gridManifest = [];
+
+    async function initGridManifest() {
+      try {
+        const res = await fetch('/data/grid/index.json');
+        if (res.ok) {
+          gridManifest = await res.json();
+        }
+      } catch (_) { }
+      if (!gridManifest || !gridManifest.length) {
+        gridManifest = Array.from({ length: 16 }, (_, i) => ({
+          day_idx: i,
+          date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+          file: `4_${i}.json`
+        }));
+      }
+      if (String(selectedYear) === '2026') {
+        yearSlider.min = 0;
+        yearSlider.max = gridManifest.length - 1;
+        updateSliderMonthLabels('2026');
+      } else {
+        yearSlider.min = 0;
+        yearSlider.max = (dailyRecords && dailyRecords.length > 0) ? (dailyRecords.length - 1) : 364;
+        updateSliderMonthLabels(selectedYear);
+      }
+      if (selectedDoy > Number(yearSlider.max)) selectedDoy = 0;
+      yearSlider.value = selectedDoy;
+      syncGlobeTime();
+      loadGridDay(selectedDoy);
+    }
+
+    function loadGridDay(dayIdx = 0) {
+      const entry = (gridManifest && gridManifest[dayIdx]) ? gridManifest[dayIdx] : null;
+      const file = entry ? entry.file : `4_${dayIdx}.json`;
+      const url = STATIC_MODE ? `/data/grid/${file}` : `/api/grid?step=4&day_idx=${dayIdx}`;
+      fetch(url).then(r => r.json()).then(d => {
+        availableDates = d.dates || [];
+        gridSnapshot = d.points || [];
+        worker.postMessage({ type: 'init', points: gridSnapshot.filter(p => p.speed > 0.05) });
+      }).catch(() => { });
+    }
+
+    // ==========================================
+    // REQUIREMENT 3 & 4: DRIVE TIMELINE & UV GRAPH FROM oscar_YEAR_daily.json
+    // ==========================================
+    const yearSlider = document.getElementById('yearSlider'), hourSlider = document.getElementById('hourSlider');
+    const tlDate = document.getElementById('tlDate'), tlHour = document.getElementById('tlHour');
+    let isDraggingSlider = false;
+
+    yearSlider.addEventListener('pointerdown', () => { isDraggingSlider = true; });
+    window.addEventListener('pointerup', () => { isDraggingSlider = false; });
+
+    async function loadYearDaily(year) {
+      try {
+        const url = STATIC_MODE ? `/data/oscar_${year}_daily.json` : `${API_BASE}/api/oscar_daily/${year}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        dailyRecords = await res.json();
+        if (String(year) === '2026') {
+          yearSlider.min = 0;
+          yearSlider.max = 15; // Restricted to Jan 1..16, 2026
+          updateSliderMonthLabels('2026');
+        } else {
+          yearSlider.min = 0;
+          yearSlider.max = Math.max(0, dailyRecords.length - 1); // Unlock all 12 months (Jan-Dec)
+          updateSliderMonthLabels(year);
+        }
+        if (selectedDoy > Number(yearSlider.max)) selectedDoy = 0;
+        yearSlider.value = selectedDoy;
+        syncGlobeTime();
+        drawVelocityBoxFromDaily();
+      } catch (err) {
+        console.error('Failed to load daily dataset for year', year, err);
+        if (String(year) === '2026') {
+          yearSlider.min = 0;
+          yearSlider.max = 15;
+          updateSliderMonthLabels('2026');
+        } else {
+          yearSlider.min = 0;
+          yearSlider.max = 364;
+          updateSliderMonthLabels(year);
+        }
+      }
+    }
+
+    function selectTimelineYear(year) {
+      selectedYear = String(year);
+      document.querySelectorAll('.tl-year-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim() === String(year));
+      });
+      loadYearDaily(year);
+    }
+
+    function syncGlobeTime() {
+      if (String(selectedYear) === '2026') {
+        const dayStr = String(selectedDoy + 1).padStart(2, '0');
+        tlDate.textContent = `2026-01-${dayStr} · Globe grid shows 1-16 Jan 2026`;
+      } else if (dailyRecords && dailyRecords[selectedDoy]) {
+        tlDate.textContent = dailyRecords[selectedDoy].date;
+      } else if (gridManifest && gridManifest[selectedDoy]) {
+        tlDate.textContent = gridManifest[selectedDoy].date;
+      } else {
+        const d = new Date(Date.UTC(Number(selectedYear) || 2025, 0, selectedDoy + 1));
+        tlDate.textContent = d.toISOString().slice(0, 10);
+      }
+      tlHour.textContent = `${String(selectedHour).padStart(2, '0')}:00`;
+      earthMat.uniforms.sunDir.value.copy(getSunDir(selectedDoy, selectedHour));
+      earthMat.uniforms.season.value = getSeasonFactor(selectedDoy);
+    }
+
+    function onTimelineChange() {
+      const sMax = Number(yearSlider.max) || 364;
+      const progress = Math.max(0, Math.min(1, selectedDoy / Math.max(1, sMax)));
+
+      syncGlobeTime();
+      drawVelocityBoxFromDaily();
+      loadGridDay(selectedDoy);
+
+      // Scrubbing slider computes corresponding bar index (0..52) and seeks active audio
+      const currentTrack = soundscapeTracks.find(t => t.id === currentTrackId);
+      const totalBars = currentTrack ? currentTrack.bars : 53;
+      const barIdx = Math.min(totalBars - 1, Math.floor(progress * totalBars));
+      if (audio.duration && !isNaN(audio.duration) && audio.duration > 0) {
+        audio.currentTime = progress * audio.duration;
+      } else {
+        const barSec = currentTrack?.bar_seconds || (4 * 60 / (currentTrack?.tempo || 60));
+        audio.currentTime = barIdx * barSec;
+      }
+      highlightAuditBar(barIdx);
+
+      const secBadge = document.getElementById(`secBadge-${currentTrackId}`);
+      if (secBadge) {
+        secBadge.textContent = getSectionCaption(barIdx, totalBars);
+      }
+      const totalDur = audio.duration || currentTrack?.duration_s || 212;
+      document.getElementById('timer').innerHTML = `${fmt(audio.currentTime)} <span>/ ${fmt(totalDur)}</span>`;
+    }
+
+    function highlightAuditBar(barIdx) {
+      const rows = document.querySelectorAll('#auditTableBody tr');
+      rows.forEach(r => {
+        const b = parseInt(r.getAttribute('data-bar'), 10);
+        if (b === barIdx) {
+          if (!r.classList.contains('active-bar')) {
+            r.classList.add('active-bar');
+            r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        } else {
+          r.classList.remove('active-bar');
+        }
+      });
+    }
+
+    yearSlider.addEventListener('input', e => {
+      selectedDoy = Number(e.target.value);
+      onTimelineChange();
+    });
+    hourSlider.addEventListener('input', e => { selectedHour = Number(e.target.value); syncGlobeTime(); });
+    document.getElementById('timelineWrap').addEventListener('wheel', e => {
+      e.preventDefault();
+      selectedDoy = Math.max(0, Math.min(Number(yearSlider.max), selectedDoy + (e.deltaY > 0 ? 1 : -1)));
+      yearSlider.value = selectedDoy;
+      onTimelineChange();
+    }, { passive: false });
+
+    initGridManifest();
+    loadYearDaily('2025');
+
+    // ==========================================
+    // REQUIREMENT 4: UV GRAPH PLOT FROM oscar_YEAR_daily.json
+    // ==========================================
+    function drawVelocityBoxFromDaily() {
+      const canvas = document.getElementById('cVel');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 276, 82);
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath(); ctx.moveTo(0, 41); ctx.lineTo(276, 41); ctx.stroke();
+      if (!dailyRecords || !dailyRecords.length) return;
+
+      const n = dailyRecords.length;
+      const plotLeft = 8;
+      const plotWidth = 260; // 8 to 268 in 276px canvas
+
+      const drawLine = (prop, col, scale = 23, offset = 41) => {
+        ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+          const val = dailyRecords[i][prop] ?? 0;
+          const x = n === 1 ? 138 : plotLeft + (i / (n - 1)) * plotWidth;
+          const y = offset - Math.max(-1.5, Math.min(1.5, val)) * scale;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      };
+
+      drawLine('core_u', '#34d399');    // u (eastward) in emerald
+      drawLine('core_v', '#fbbf24');    // v (northward) in amber
+      drawLine('speed_p95', '#38bdf8');  // speed_p95 in sky blue
+
+      // Active playhead / sync cursor line: one continuous sweep across full width
+      let progress = 0;
+      if (audio && !audio.paused && audio.duration && !isNaN(audio.duration) && audio.duration > 0) {
+        progress = Math.max(0, Math.min(1, audio.currentTime / audio.duration));
+      } else {
+        const sMax = Number(yearSlider?.max) || 364;
+        progress = Math.max(0, Math.min(1, selectedDoy / Math.max(1, sMax)));
+      }
+      const ax = plotLeft + progress * plotWidth;
+
+      // Glow backdrop line
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.40)';
+      ctx.lineWidth = 3.0;
+      ctx.beginPath(); ctx.moveTo(ax, 2); ctx.lineTo(ax, 80); ctx.stroke();
+
+      // Sharp white cursor line
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(ax, 2); ctx.lineTo(ax, 80); ctx.stroke();
+
+      // Update Header & Ocean Card Stats from current day record
+      const currIdx = Math.min(n - 1, Math.round(progress * (n - 1)));
+      const curr = dailyRecords[currIdx] || dailyRecords[0];
+      if (curr) {
+        const spd = (curr.speed_p95 || curr.speed_mean || 0).toFixed(3);
+        const uVal = (curr.core_u || curr.u_mean || 0).toFixed(3);
+        const vVal = (curr.core_v || curr.v_mean || 0).toFixed(3);
+        const lblVel = document.getElementById('lblVel');
+        if (lblVel) lblVel.textContent = `${spd} m/s`;
+        flowU = parseFloat(uVal); flowV = parseFloat(vVal); flowSpeed = parseFloat(spd);
+        const ocSpeed = document.getElementById('ocSpeed');
+        if (ocSpeed) ocSpeed.textContent = `${spd} m/s`;
+        const ocU = document.getElementById('ocU');
+        if (ocU) ocU.textContent = `${uVal} m/s`;
+        const ocV = document.getElementById('ocV');
+        if (ocV) ocV.textContent = `${vVal} m/s`;
+        const ocAngle = document.getElementById('ocAngle');
+        if (ocAngle) ocAngle.textContent = `${(curr.core_angle_deg || 0).toFixed(1)}°`;
+      }
+    }
+
+    const ringGeo = new THREE.RingGeometry(0.035, 0.055, 32);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.95,
+      depthTest: false
+    });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.renderOrder = 999;
+    ringMesh.visible = false;
+    scene.add(ringMesh);
+
+    const dotGeo = new THREE.CircleGeometry(0.016, 32);
+    const dotMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.9,
+      depthTest: false
+    });
+    const dotMesh = new THREE.Mesh(dotGeo, dotMat);
+    dotMesh.renderOrder = 1000;
+    ringMesh.add(dotMesh);
+
+    let targetCamPos = null;
+    function zoomToPoint(hitVec) {
+      targetCamPos = hitVec.clone().normalize().multiplyScalar(1.65);
+      ringMesh.position.copy(hitVec.clone().normalize().multiplyScalar(1.008));
+      ringMesh.lookAt(hitVec.clone().multiplyScalar(2));
+      ringMesh.visible = true;
+    }
+
+    const raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
+    let downPos = { x: 0, y: 0 };
+    renderer.domElement.addEventListener('pointerdown', e => { downPos = { x: e.clientX, y: e.clientY }; });
+    renderer.domElement.addEventListener('pointerup', e => {
+      if (Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 5) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObject(earthMesh);
+      if (!hits.length) return;
+      const p = hits[0].point;
+      const lat = Math.asin(p.y) * (180 / Math.PI);
+      const lng = ((Math.atan2(p.z, -p.x) * (180 / Math.PI) - 180) + 540) % 360 - 180;
+      zoomToPoint(p);
+      handleGlobeClick(lat, lng);
+    });
+
+    const fCtx = document.getElementById('cFlow').getContext('2d');
+    const flowPts = Array.from({ length: 65 }, () => ({ x: Math.random() * 276, y: Math.random() * 82 }));
+
+    function speedToColor(spd) {
+      const t = Math.min(1, spd / 1.4);
+      if (t < 0.5) {
+        const k = t * 2;
+        return `rgb(${Math.round(45 - 15 * k)}, ${Math.round(25 + 140 * k)}, ${Math.round(95 + 65 * k)})`;
+      }
+      const k = (t - 0.5) * 2;
+      return `rgb(${Math.round(30 + 220 * k)}, ${Math.round(165 + 65 * k)}, ${Math.round(160 - 125 * k)})`;
+    }
+
+    function drawFlowBox() {
+      fCtx.fillStyle = '#060a12';
+      fCtx.fillRect(0, 0, 276, 82);
+
+      for (let i = 0; i < gridSnapshot.length; i += 2) {
+        const p = gridSnapshot[i];
+        const x = ((p.lng + 180) / 360) * 276;
+        const y = ((90 - p.lat) / 180) * 82;
+        fCtx.fillStyle = speedToColor(p.speed);
+        fCtx.fillRect(x, y, 2.2, 2.2);
+      }
+
+      fCtx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      fCtx.lineWidth = 1.2;
+      const vx = flowU * 4.0, vy = -flowV * 4.0;
+      for (const pt of flowPts) {
+        const ox = pt.x, oy = pt.y;
+        pt.x = (pt.x + vx + 276) % 276;
+        pt.y = (pt.y + vy + 82) % 82;
+        if (Math.abs(pt.x - ox) < 20 && Math.abs(pt.y - oy) < 20) {
+          fCtx.beginPath(); fCtx.moveTo(ox, oy); fCtx.lineTo(pt.x, pt.y); fCtx.stroke();
+        }
+      }
+
+      if (lastCoords) {
+        const tx = ((lastCoords.lng + 180) / 360) * 276;
+        const ty = ((90 - lastCoords.lat) / 180) * 82;
+        fCtx.fillStyle = '#38bdf8';
+        fCtx.beginPath(); fCtx.arc(tx, ty, 3.8, 0, Math.PI * 2); fCtx.fill();
+        fCtx.strokeStyle = '#ffffff'; fCtx.lineWidth = 1.2; fCtx.stroke();
+      }
+
+      // Playhead sync line on Global Speed / Flow graph (matches Velocity box)
+      const fPlotLeft = 8;
+      const fPlotWidth = 260;
+      let progress = 0;
+      if (audio && !audio.paused && audio.duration && !isNaN(audio.duration) && audio.duration > 0) {
+        progress = Math.max(0, Math.min(1, audio.currentTime / audio.duration));
+      } else {
+        const sMax = Number(yearSlider?.max) || 364;
+        progress = Math.max(0, Math.min(1, selectedDoy / Math.max(1, sMax)));
+      }
+      const fAx = fPlotLeft + progress * fPlotWidth;
+      fCtx.strokeStyle = 'rgba(56, 189, 248, 0.40)';
+      fCtx.lineWidth = 3.0;
+      fCtx.beginPath(); fCtx.moveTo(fAx, 2); fCtx.lineTo(fAx, 80); fCtx.stroke();
+
+      fCtx.strokeStyle = '#ffffff';
+      fCtx.lineWidth = 1.5;
+      fCtx.beginPath(); fCtx.moveTo(fAx, 2); fCtx.lineTo(fAx, 80); fCtx.stroke();
+    }
+
+    const audio = document.getElementById('audioEl');
+    let audioCtx, analyser, freqBuf, timeBuf, musicPanner, voicePanner, musicGainNode;
+    function initWebAudio() {
+      if (audioCtx) return;
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser(); analyser.fftSize = 128;
+
+        musicGainNode = audioCtx.createGain();
+        musicGainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
+
+        if (audioCtx.createStereoPanner) {
+          musicPanner = audioCtx.createStereoPanner();
+          voicePanner = audioCtx.createStereoPanner();
+        }
+
+        const src = audioCtx.createMediaElementSource(audio);
+        src.connect(musicGainNode);
+        if (musicPanner) {
+          musicGainNode.connect(musicPanner);
+          musicPanner.connect(analyser);
+        } else {
+          musicGainNode.connect(analyser);
+        }
+        analyser.connect(audioCtx.destination);
+
+        try {
+          if (typeof voiceAudio !== 'undefined') {
+            const vSrc = audioCtx.createMediaElementSource(voiceAudio);
+            if (voicePanner) {
+              vSrc.connect(voicePanner);
+              voicePanner.connect(audioCtx.destination);
+            } else {
+              vSrc.connect(audioCtx.destination);
+            }
+          }
+        } catch (_) { }
+
+        freqBuf = new Uint8Array(analyser.frequencyBinCount);
+        timeBuf = new Uint8Array(analyser.fftSize);
+      } catch (e) {
+        console.warn('Web Audio initialization error:', e);
+      }
+    }
+
+    function duckMusicGain(targetGain = 0.18, durationMs = 200) {
+      initWebAudio();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
+      if (musicGainNode && audioCtx) {
+        const clamped = Math.min(1.0, Math.max(0.0, targetGain));
+        const now = audioCtx.currentTime;
+        musicGainNode.gain.cancelScheduledValues(now);
+        musicGainNode.gain.setTargetAtTime(clamped, now, durationMs / 1000 / 3);
+      }
+    }
+
+    function restoreMusicGain(targetGain = 1.0, durationMs = 400) {
+      initWebAudio();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
+      if (musicGainNode && audioCtx) {
+        const clamped = Math.min(1.0, Math.max(0.0, targetGain));
+        const now = audioCtx.currentTime;
+        musicGainNode.gain.cancelScheduledValues(now);
+        musicGainNode.gain.setTargetAtTime(clamped, now, durationMs / 1000 / 3);
+      }
+    }
+
+    function updateSpatialPan(targetLon = null) {
+      if (!musicPanner || !audioCtx) return 0.0;
+      let rLon = targetLon;
+      if (rLon == null) {
+        const track = soundscapeTracks.find(t => t.id === currentTrackId);
+        if (track) {
+          rLon = track.center_lon != null ? track.center_lon : (track.lon ? (track.lon[0] + track.lon[1]) / 2 : 0);
+          if (rLon > 180) rLon -= 360;
+        }
+      }
+      if (rLon == null) return 0.0;
+      const camAngleRad = Math.atan2(camera.position.x, camera.position.z);
+      const camLonDeg = (camAngleRad * 180 / Math.PI);
+      let delta = (rLon - camLonDeg + 540) % 360 - 180;
+      const panVal = Math.min(1.0, Math.max(-1.0, delta / 60.0));
+      if (musicPanner.pan && typeof musicPanner.pan.setTargetAtTime === 'function') {
+        musicPanner.pan.setTargetAtTime(panVal, audioCtx.currentTime, 0.05);
+      }
+      if (voicePanner && voicePanner.pan && typeof voicePanner.pan.setTargetAtTime === 'function') {
+        voicePanner.pan.setTargetAtTime(panVal * 0.4, audioCtx.currentTime, 0.05);
+      }
+      return panVal;
+    }
+
+    function playRegionLockEarcon(panVal = 0.0) {
+      if (!audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const earconPanner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+        if (earconPanner && earconPanner.pan) {
+          earconPanner.pan.setValueAtTime(panVal, now);
+        }
+
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0.09, now);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+
+        // Two harmonic sine bell tones: C5 (523.25 Hz) and G5 (783.99 Hz)
+        [523.25, 783.99].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+          osc.connect(masterGain);
+          osc.start(now + idx * 0.05);
+          osc.stop(now + 0.65);
+        });
+
+        if (earconPanner) {
+          masterGain.connect(earconPanner);
+          earconPanner.connect(audioCtx.destination);
+        } else {
+          masterGain.connect(audioCtx.destination);
+        }
+      } catch (_) { }
+    }
+
+    function drawAudioBox() {
+      const ctx = document.getElementById('cAudio').getContext('2d');
+      ctx.fillStyle = '#04070d'; ctx.fillRect(0, 0, 276, 82);
+      if (!analyser || !freqBuf) return;
+      analyser.getByteFrequencyData(freqBuf);
+      analyser.getByteTimeDomainData(timeBuf);
+
+      const bw = 276 / freqBuf.length;
+      for (let i = 0; i < freqBuf.length; i++) {
+        const h = (freqBuf[i] / 255) * 65;
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.38)';
+        ctx.fillRect(i * bw, 82 - h, bw - 1, h);
+      }
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4; ctx.beginPath();
+      for (let i = 0; i < timeBuf.length; i++) {
+        const x = (i / timeBuf.length) * 276;
+        const y = (timeBuf[i] / 255) * 82;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (currentVisualMode === 'svs' && svsTexture) {
+        if (svsVideo && !svsVideo.error && svsVideo.readyState >= 2 && svsVideo.videoWidth > 0) {
+          svsTexture.needsUpdate = true;
+        } else if (svsVideo && svsVideo.error) {
+          setVisualMode('oscar');
+        }
+      }
+      if (targetCamPos) { camera.position.lerp(targetCamPos, 0.06); if (camera.position.distanceTo(targetCamPos) < 0.02) targetCamPos = null; }
+      if (ringMesh.visible) { const s = 1 + 0.25 * Math.sin(performance.now() * 0.008); ringMesh.scale.set(s, s, 1); }
+
+      // 60fps playhead sync sweep across entire graph & slider
+      if (audio && !audio.paused && audio.duration) {
+        syncPlaybackProgress();
+      }
+
+      drawFlowBox();
+      drawVelocityBoxFromDaily();
+      drawAudioBox();
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function updateGlobeViewport(isMax) {
+      const w = isMax ? window.innerWidth * 0.5 : window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    window.addEventListener('resize', () => {
+      updateGlobeViewport(isPanelMaximized);
+    });
+
+    function identifyOcean(lat, lon) {
+      if (lat >= 66.5) return { name: 'Arctic Ocean', note: 'Polar basin with sea-ice-modulated surface circulation.' };
+      if (lat <= -60.0) return { name: 'Southern Ocean', note: 'Home to the Antarctic Circumpolar Current, Earth’s strongest unbroken flow.' };
+      if (lat >= 5 && lat <= 26 && lon >= 50 && lon <= 78) return { name: 'Arabian Sea', note: 'Monsoon-reversing currents driven by seasonal Indian Ocean winds.' };
+      if (lat >= 24 && lat <= 45 && lon >= -82 && lon <= -40) return { name: 'North Atlantic (Gulf Stream)', note: 'Fast western boundary current transporting warm tropical water northward.' };
+      if (lat >= -60 && lat <= 30 && lon >= 20 && lon <= 120) return { name: 'Indian Ocean', note: 'Subtropical gyre and equatorial counter-current dynamics.' };
+      if (lon > -70 && lon < 20) return { name: lat >= 0 ? 'North Atlantic Ocean' : 'South Atlantic Ocean', note: 'Basin-scale wind-driven gyre and meridional overturning flow.' };
+      return { name: lat >= 0 ? 'North Pacific Ocean' : 'South Pacific Ocean', note: 'Largest oceanic basin with strong equatorial and Kuroshio/Humboldt currents.' };
+    }
+
+    function fmt(sec) { const s = Math.floor(sec || 0); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+
+    function getSectionCaption(barIdx, totalBars) {
+      if (totalBars === 53) {
+        if (barIdx < 8) return 'Intro (Bars 1-8)';
+        if (barIdx < 20) return 'Build (Bars 9-20)';
+        if (barIdx < 36) return 'Peak (Bars 21-36)';
+        if (barIdx < 48) return 'Calm (Bars 37-48)';
+        return 'Outro (Bars 49-53)';
+      }
+      if (totalBars === 31) {
+        if (barIdx < 4) return 'Intro (Bars 1-4)';
+        if (barIdx < 12) return 'Build (Bars 5-12)';
+        if (barIdx < 20) return 'Peak (Bars 13-20)';
+        if (barIdx < 28) return 'Calm (Bars 21-28)';
+        return 'Outro (Bars 29-31)';
+      }
+      if (totalBars === 16) {
+        if (barIdx < 2) return 'Intro (Bars 1-2)';
+        if (barIdx < 6) return 'Build (Bars 3-6)';
+        if (barIdx < 11) return 'Peak (Bars 7-11)';
+        if (barIdx < 14) return 'Calm (Bars 12-14)';
+        return 'Outro (Bars 15-16)';
+      }
+      const ratio = (barIdx + 1) / (totalBars || 53);
+      if (ratio <= 0.15) return 'Intro';
+      if (ratio <= 0.38) return 'Build';
+      if (ratio <= 0.68) return 'Peak';
+      if (ratio <= 0.90) return 'Calm';
+      return 'Outro';
+    }
+
+    function syncPlaybackProgress() {
+      const currentTrack = soundscapeTracks.find(t => t.id === currentTrackId);
+      const totalDur = audio.duration || currentTrack?.duration_s || 212;
+      document.getElementById('timer').innerHTML = `${fmt(audio.currentTime)} <span>/ ${fmt(totalDur)}</span>`;
+
+      const totalBars = currentTrack ? currentTrack.bars : 53;
+      const progress = (audio.duration && !isNaN(audio.duration) && audio.duration > 0)
+        ? Math.max(0, Math.min(1, audio.currentTime / audio.duration))
+        : 0;
+      const currentBar = Math.min(totalBars - 1, Math.floor(progress * totalBars));
+
+      // Update Section badge in Tracks View
+      const secBadge = document.getElementById(`secBadge-${currentTrackId}`);
+      if (secBadge) {
+        secBadge.textContent = getSectionCaption(currentBar, totalBars);
+      }
+
+      // Sync slider position during audio playback
+      if (!isDraggingSlider && totalBars > 1) {
+        const sMax = Number(yearSlider.max) || 364;
+        const targetVal = Math.round(progress * sMax);
+        if (Number(yearSlider.value) !== targetVal) {
+          yearSlider.value = targetVal;
+          selectedDoy = targetVal;
+          syncGlobeTime();
+        }
+      }
+
+      // Highlight active row in From Data to Bar table
+      highlightAuditBar(currentBar);
+    }
+
+    // Time update listener: Updates timer, active section, audit table row, and slider position
+    audio.addEventListener('timeupdate', () => {
+      syncPlaybackProgress();
+      drawVelocityBoxFromDaily();
+    });
+    audio.addEventListener('seeked', () => {
+      syncPlaybackProgress();
+      drawVelocityBoxFromDaily();
+    });
+
+    audio.addEventListener('play', () => { document.getElementById('playPauseBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'; });
+    audio.addEventListener('pause', () => { document.getElementById('playPauseBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'; });
+
+    function togglePlay() {
+      initWebAudio();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      audio.paused ? audio.play() : audio.pause();
+    }
+    function stopAudio() {
+      audio.pause();
+      audio.currentTime = 0;
+      syncPlaybackProgress();
+      drawVelocityBoxFromDaily();
+    }
+    function restartAudio() {
+      audio.currentTime = 0;
+      audio.play();
+      syncPlaybackProgress();
+      drawVelocityBoxFromDaily();
+    }
+    function seek(d) { audio.currentTime = Math.max(0, Math.min(audio.duration || 176, audio.currentTime + d)); }
+    function toggleLoop() { audio.loop = !audio.loop; document.getElementById('loopBtn').style.color = audio.loop ? '#38bdf8' : '#e4e4e7'; }
+    function switchMode(m) {
+      currentMode = m;
+      document.getElementById('btnA').classList.toggle('active', m === 'musical');
+      document.getElementById('btnB').classList.toggle('active', m === 'diagnostic');
+    }
+    function downloadFile(ext) {
+      if (ext === 'json') {
+        window.open(`/data/audit_${currentTrackId}.json`, '_blank');
+      } else {
+        window.open(`/tracks/${currentTrackId}.mp3`, '_blank');
+      }
+    }
+    function resetGlobe() { targetCamPos = new THREE.Vector3(0, 0.5, 2.7); ringMesh.visible = false; }
+
+    // ==========================================
+    // REQUIREMENT 6: MERGED LEFT PANEL CONTROLS (MINIMIZE / MAXIMIZE)
+    // ==========================================
+    const leftPanel = document.getElementById('leftPanel');
+    const minPill = document.getElementById('minimizedPill');
+
+    function toggleLeftPanel() {
+      if (leftPanel.classList.contains('closed')) {
+        restoreLeftPanel();
+      } else {
+        closeLeftPanel();
+      }
+    }
+    function closeLeftPanel() {
+      leftPanel.classList.add('closed');
+      minPill.classList.remove('show');
+      document.body.classList.remove('panel-maximized');
+      isPanelMaximized = false;
+      updateGlobeViewport(false);
+      document.getElementById('btnToggleLeft').classList.remove('active');
+    }
+    function minimizeLeftPanel() {
+      leftPanel.classList.add('closed');
+      minPill.classList.add('show');
+      document.body.classList.remove('panel-maximized');
+      isPanelMaximized = false;
+      updateGlobeViewport(false);
+    }
+    function restoreLeftPanel() {
+      leftPanel.classList.remove('closed');
+      minPill.classList.remove('show');
+      document.getElementById('btnToggleLeft').classList.add('active');
+    }
+    function toggleMaximizePanel() {
+      isPanelMaximized = !isPanelMaximized;
+      leftPanel.classList.toggle('maximized', isPanelMaximized);
+      document.body.classList.toggle('panel-maximized', isPanelMaximized);
+      document.getElementById('btnMaxPanel').textContent = isPanelMaximized ? 'ðŸ——' : 'â›¶';
+      updateGlobeViewport(isPanelMaximized);
+    }
+
+    // Observe bottom dock height dynamically (Requirement 1)
+    const bottomDock = document.getElementById('bottomDock');
+    if (bottomDock && window.ResizeObserver) {
+      const ro = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const h = entry.borderBoxSize?.[0]?.blockSize || entry.contentRect.height;
+          if (h) document.documentElement.style.setProperty('--dock-h', `${Math.round(h)}px`);
+        }
+      });
+      ro.observe(bottomDock);
+    }
+
+    function switchPanelView(viewId) {
+      document.querySelectorAll('.panel-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel-view').forEach(v => v.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.panel-tab-btn')).find(b => b.getAttribute('onclick')?.includes(viewId));
+      if (activeBtn) activeBtn.classList.add('active');
+      const targetView = document.getElementById(viewId);
+      if (targetView) targetView.classList.add('active');
+      if (viewId === 'viewAudit') {
+        const tid = currentTrackId || '2025';
+        if (!currentAuditData || currentAuditTrackId !== tid) {
+          loadAuditTable(tid);
+        }
+      }
+    }
+
+    function toggleSvsCatalog() {
+      const c = document.getElementById('svsCatalog');
+      c.classList.toggle('open');
+      document.getElementById('openSvsCatalog').classList.toggle('active', c.classList.contains('open'));
+      if (c.classList.contains('open')) {
+        if (STATIC_MODE) {
+          renderStaticSvsList();
+        } else if (!document.getElementById('svsResults').children.length) {
+          searchSvs();
+        }
+      }
+    }
+
+    function haversineDistKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function isInsideRegion(lat, lng, track) {
+      if (!track.lat || !track.lon) return false;
+      const minLat = Math.min(...track.lat);
+      const maxLat = Math.max(...track.lat);
+      if (lat < minLat || lat > maxLat) return false;
+
+      const minLonRaw = Math.min(...track.lon);
+      const maxLonRaw = Math.max(...track.lon);
+      const lng360 = (lng + 360) % 360;
+      const inRaw = (lng >= minLonRaw && lng <= maxLonRaw);
+      const in360 = (lng360 >= minLonRaw && lng360 <= maxLonRaw);
+      return inRaw || in360;
+    }
+
+    // Populate Soundscapes Tracks (all 15 regions from /api/tracks)
+    async function initSoundscapes() {
+      try {
+        const url = STATIC_MODE ? '/data/tracks.json' : `${API_BASE}/api/tracks`;
+        const res = await fetch(url);
+        const data = await res.json();
+        soundscapeTracks = Array.isArray(data) ? data : (data.tracks || []);
+
+        const select = document.getElementById('auditTrackSelect');
+        if (select) {
+          select.innerHTML = '';
+          soundscapeTracks.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = `${t.region || t.title} (${t.scale || t.key}, ${t.bars} bars)`;
+            select.appendChild(opt);
+          });
+        }
+
+        const container = document.getElementById('trackListContainer');
+        container.innerHTML = '';
+        soundscapeTracks.forEach(t => {
+          const card = document.createElement('div');
+          card.className = `track-card ${t.id === currentTrackId ? 'active' : ''}`;
+          card.id = `trackCard-${t.id}`;
+          const domainLabel = t.domain === 'ocean' ? 'Ocean OSCAR' : (t.domain === 'land_combined' ? 'Land FIRMS + Canopy' : 'Land Fire');
+          card.innerHTML = `
+            <div class="tc-top">
+              <span class="tc-title">${t.region || t.title}</span>
+              <span class="tc-badge">${t.bars} bars Â· ${t.key} ${t.scale || ''}</span>
+            </div>
+            <div class="tc-meta">
+              Domain: <span style="color:var(--accent); font-weight:500;">${domainLabel}</span> Â· Tempo: ${t.tempo} BPM<br/>
+              Duration: ${Math.round(t.duration_s || 212)}s Â· Unit: ${t.bar_seconds ? t.bar_seconds.toFixed(2) + 's/bar' : '4s/bar'}
+            </div>
+            <div class="tc-section-badge" id="secBadge-${t.id}">Section: Intro</div>
+            <div class="tc-visual">
+              Derived from satellite data Â· Every note is computed from the data by rules we chose.
+            </div>
+          `;
+          card.addEventListener('click', () => selectAndPlayTrack(t.id));
+          container.appendChild(card);
+        });
+
+        if (soundscapeTracks.length > 0 && !currentTrackId) {
+          currentTrackId = soundscapeTracks[0].id;
+        }
+      } catch (err) {
+        console.error('Could not load soundscape tracks:', err);
+      }
+    }
+    initSoundscapes();
+    if (window.location.hash === '#maximized') {
+      toggleMaximizePanel();
+      switchPanelView('viewAudit');
+    }
+
+    async function selectAndPlayTrack(trackId, snappedDistKm = null) {
+      currentTrackId = trackId;
+      const track = soundscapeTracks.find(t => t.id === trackId) || soundscapeTracks[0];
+      if (!track) return;
+
+      // Switching to any of the 15 tracks automatically sets the slider to the full 12-month 2025 range if on 2026
+      if (String(selectedYear) !== '2025') {
+        selectTimelineYear('2025');
+      } else if (Number(yearSlider.max) < 364) {
+        yearSlider.min = 0;
+        yearSlider.max = (dailyRecords && dailyRecords.length > 0) ? (dailyRecords.length - 1) : 364;
+        updateSliderMonthLabels('2025');
+      }
+
+      if (currentVisualMode === 'svs') {
+        setVisualMode('oscar');
+      }
+
+      // Fly camera and position circular indicator at region center
+      const cLat = track.center_lat != null ? track.center_lat : (track.lat ? (track.lat[0] + track.lat[1]) / 2 : 0);
+      let cLon = track.center_lon != null ? track.center_lon : (track.lon ? (track.lon[0] + track.lon[1]) / 2 : 0);
+      if (cLon > 180) cLon -= 360;
+      const centerVec = latLonToVec3(cLat, cLon, 1.0);
+      zoomToPoint(centerVec);
+
+      document.querySelectorAll('.track-card').forEach(c => c.classList.remove('active'));
+      const activeCard = document.getElementById(`trackCard-${trackId}`);
+      if (activeCard) activeCard.classList.add('active');
+
+      const select = document.getElementById('auditTrackSelect');
+      if (select && select.value !== trackId) select.value = trackId;
+
+      initWebAudio();
+      if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+      const panVal = updateSpatialPan(cLon);
+      playRegionLockEarcon(panVal);
+
+      const audioUrl = `${API_BASE}${track.audio_url || `/api/stream/${track.id}`}`;
+      audio.src = audioUrl;
+      audio.loop = true;
+      audio.currentTime = 0;
+      audio.play().catch(() => { });
+
+      let meta = null;
+      try {
+        const metaUrl = `${API_BASE}${track.meta_url || `/final/2025/${track.id}/meta.json`}`;
+        const res = await fetch(metaUrl);
+        if (res.ok) {
+          meta = await res.json();
+          currentMeta = meta;
+        }
+      } catch (err) {
+        console.warn('Could not load meta.json:', err);
+      }
+
+      document.getElementById('trackLabel').textContent = `${track.region || track.id} (${track.scale || meta?.preset?.scale_name || ''}) Â· ${track.tempo} BPM`;
+
+      const oceanCard = document.getElementById('oceanCard');
+      if (oceanCard) {
+        oceanCard.classList.add('open');
+        document.getElementById('ocName').textContent = track.region || track.id;
+        const distText = snappedDistKm !== null
+          ? (snappedDistKm === 0 ? 'Inside region (0 km)' : `Snapped: ${Math.round(snappedDistKm)} km away`)
+          : (track.domain ? track.domain.toUpperCase() : 'Region Selected');
+        document.getElementById('ocCoords').textContent = distText;
+
+        document.getElementById('ocTempo').textContent = `${track.tempo} BPM`;
+        document.getElementById('ocScale').textContent = `${track.key} ${track.scale || meta?.preset?.scale_name || ''}`;
+        document.getElementById('ocBars').textContent = `${track.bars || 53} bars`;
+        document.getElementById('ocDuration').textContent = `${Math.round(track.duration_s || 212)}s`;
+
+        const dsName = meta?.scientific_data?.dataset?.name || 'NASA Satellite Data';
+        const dsFields = (meta?.scientific_data?.dataset?.fields_used || []).join(', ') || 'Gridded parameters';
+        const gmProgs = meta?.gm_programs ? Object.entries(meta.gm_programs).map(([k, v]) => `${k}:${v}`).join(', ') : 'GM SoundFont';
+        document.getElementById('ocScientificSummary').innerHTML = `
+          <strong>Dataset:</strong> ${dsName}<br/>
+          <strong>Fields:</strong> ${dsFields}<br/>
+          <strong>Bar Count:</strong> ${track.bars || 53} bars (${meta?.bar_unit || 'week'})<br/>
+          <strong>Tempo:</strong> ${track.tempo} BPM Â· Key: ${track.key} ${track.scale || ''}<br/>
+          <strong>Instruments:</strong> ${gmProgs}
+        `;
+
+        const factsText = meta?.facts_narrative?.text || 'Computed from the data by rules we chose.';
+        const factsCitations = (meta?.facts_narrative?.facts_used || []).join(', ');
+        document.getElementById('ocFacts').innerHTML = `
+          ${factsText}
+          ${factsCitations ? `<div style="font-size:10px; color:var(--muted); margin-top:3px;">Audit row citations: bars [${factsCitations}]</div>` : ''}
+        `;
+
+        document.getElementById('ocStoryLabel').textContent = meta?.story?.label || 'Artistic interpretation â€” not a scientific claim';
+        document.getElementById('ocStory').textContent = meta?.story?.text || '';
+        document.getElementById('ocCulturalFrame').textContent = meta?.cultural_frame || '';
+
+        document.getElementById('ocLimits').innerHTML = `
+          <strong>Honest Limits:</strong> ${meta?.scientific_data?.honest_limits || 'Derived from satellite data; sonified by rules we chose.'}<br/>
+          <strong>AI Disclosure:</strong> ${meta?.ai_disclosure || 'Every note is computed from the data by rules we chose.'}
+        `;
+      }
+
+      const viewAudit = document.getElementById('viewAudit');
+      if (viewAudit && viewAudit.classList.contains('active')) {
+        loadAuditTable(trackId);
+      } else {
+        currentAuditData = null;
+      }
+    }
+
+    function loadAuditForSelectedTrack() {
+      const tid = document.getElementById('auditTrackSelect').value;
+      selectAndPlayTrack(tid);
+      loadAuditTable(tid);
+    }
+
+    let _auditRenderReq = 0;
+    function renderAuditRowsFromData(data) {
+      const tbody = document.getElementById('auditTableBody');
+      if (!tbody) return;
+      currentAuditData = data;
+      tbody.innerHTML = '';
+      const currentReq = ++_auditRenderReq;
+      const chunkSize = 25;
+      let index = 0;
+
+      function renderChunk() {
+        if (currentReq !== _auditRenderReq) return;
+        const end = Math.min(index + chunkSize, data.length);
+        const frag = document.createDocumentFragment();
+        for (let i = index; i < end; i++) {
+          const row = data[i];
+          const tr = document.createElement('tr');
+          tr.setAttribute('data-bar', row.bar);
+          tr.style.cursor = 'pointer';
+          tr.title = `Click to seek to Bar ${row.bar}`;
+          tr.addEventListener('click', () => {
+            const curTrack = soundscapeTracks.find(t => t.id === currentTrackId);
+            const bSec = curTrack?.bar_seconds || (4 * 60 / (curTrack?.tempo || 60));
+            audio.currentTime = row.bar * bSec;
+            highlightAuditBar(row.bar);
+            if (curTrack) {
+              const cLat = curTrack.center_lat != null ? curTrack.center_lat : (curTrack.lat ? (curTrack.lat[0] + curTrack.lat[1]) / 2 : 0);
+              let cLon = curTrack.center_lon != null ? curTrack.center_lon : (curTrack.lon ? (curTrack.lon[0] + curTrack.lon[1]) / 2 : 0);
+              if (cLon > 180) cLon -= 360;
+              const centerVec = latLonToVec3(cLat, cLon, 1.0);
+              zoomToPoint(centerVec);
+            }
+          });
+          const valSpd = row.mean_speed_p95_m_s != null ? row.mean_speed_p95_m_s.toFixed(3) : (row.mean_fire_detections_per_day != null ? row.mean_fire_detections_per_day.toFixed(1) + ' fires/d' : 'â€”');
+          const sectorOrSource = row.direction_sector || (row.direction_source_description ? row.direction_source_description.slice(0, 15) : 'â€”');
+          const magOrCanopy = row.magnitude_m_s != null ? row.magnitude_m_s.toFixed(4) : (row.canopy_step_index != null ? 'Step ' + row.canopy_step_index : (row.centroid_shift_magnitude_deg != null ? row.centroid_shift_magnitude_deg.toFixed(2) + 'Â°' : 'â€”'));
+          const mel = row.melody_rest ? 'REST' : (row.has_color_tone ? 'Color Tone' : 'Active');
+          tr.innerHTML = `
+            <td style="font-weight:600; color:var(--accent);">${row.bar}</td>
+            <td>${row.start_date ? row.start_date.slice(5) : 'â€”'} - ${row.end_date ? row.end_date.slice(5) : 'â€”'}</td>
+            <td>${row.section || 'â€”'}</td>
+            <td>${valSpd}</td>
+            <td>${row.norm_speed != null ? row.norm_speed.toFixed(3) : 'â€”'}</td>
+            <td>${sectorOrSource}</td>
+            <td>${magOrCanopy}</td>
+            <td>${row.held ? 'Yes' : 'No'}</td>
+            <td style="font-weight:600; color:#fff;">${row.chord || 'â€”'}</td>
+            <td>${row.drum_tier || 'â€”'}</td>
+            <td>${mel}</td>
+            <td>${row.has_color_tone ? 'Color' : 'Base'}</td>
+          `;
+          frag.appendChild(tr);
+        }
+        tbody.appendChild(frag);
+        index = end;
+        if (index < data.length) {
+          requestAnimationFrame(renderChunk);
+        }
+      }
+      renderChunk();
+    }
+
+    async function loadAuditTable(trackId) {
+      currentAuditTrackId = trackId;
+      const tbody = document.getElementById('auditTableBody');
+      tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:18px; color:var(--muted);">Loading audit data...</td></tr>';
+      try {
+        let meta = currentMeta;
+        if (!meta || meta.preset?.track_id !== trackId) {
+          const track = soundscapeTracks.find(t => t.id === trackId);
+          const metaUrl = track?.meta_url || `/final/2025/${trackId}/meta.json`;
+          const res = await fetch(`${API_BASE}${metaUrl}`);
+          meta = await res.json();
+          currentMeta = meta;
+        }
+        const data = meta?.scientific_data?.audit_table || [];
+        renderAuditRowsFromData(data);
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:#f87171;">Audit table unavailable for this track.</td></tr>';
+      }
+    }
+
+    // Globe Click Handler: Snaps to nearest of all 15 regions and displays snapped distance in km
+    function handleGlobeClick(lat, lng) {
+      lastCoords = { lat, lng };
+
+      if (!soundscapeTracks || soundscapeTracks.length === 0) return;
+
+      let nearestTrack = null;
+      let minDistance = Infinity;
+
+      for (const t of soundscapeTracks) {
+        if (isInsideRegion(lat, lng, t)) {
+          nearestTrack = t;
+          minDistance = 0;
+          break;
+        }
+        const cLat = t.center_lat != null ? t.center_lat : (t.lat ? (t.lat[0] + t.lat[1]) / 2 : 0);
+        let cLon = t.center_lon != null ? t.center_lon : (t.lon ? (t.lon[0] + t.lon[1]) / 2 : 0);
+        if (cLon > 180) cLon -= 360;
+        const dist = haversineDistKm(lat, lng, cLat, cLon);
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearestTrack = t;
+        }
+      }
+
+      if (nearestTrack) {
+        selectAndPlayTrack(nearestTrack.id, minDistance);
+      }
+    }
+
+    // ==========================================
+    // REQUIREMENT 5: SVS SEARCH, GENERATE & PAIR
+    // ==========================================
+    const catalog = document.getElementById('svsCatalog');
+    const svsStatus = document.getElementById('svsStatus');
+    let _svsDebounceTimer = null;
+    let _svsAbortController = null;
+    const _svsSearchSessionCache = new Map();
+
+    const SVS_STATIC_ITEMS = [
+      { id: 5688, title: 'El NiÃ±o 2026: Sea Surface Temperature Anomaly', date: '2026-02-12', type: 'NASA SVS 5688' },
+      { id: 5687, title: 'El NiÃ±o 2026: Ocean Apparent Visible Wavelength', date: '2026-02-12', type: 'NASA SVS 5687' },
+      { id: 4950, title: 'GEDI Forest Canopy Height (Spatial Transect)', date: '2022-04-14', type: 'NASA SVS 4950' },
+      { id: 3912, title: 'Perpetual Ocean: ECCO2 Surface Current Flow', date: '2012-03-29', type: 'NASA SVS 3912' }
+    ];
+
+    function initStaticSvsView() {
+      if (!STATIC_MODE) return;
+      const searchRow = document.querySelector('.svs-row');
+      if (searchRow) searchRow.style.display = 'none';
+      const eicLabel = document.getElementById('svsEicOnly')?.parentElement;
+      if (eicLabel) eicLabel.style.display = 'none';
+      const navRow = document.getElementById('svsPrevious')?.parentElement;
+      if (navRow) navRow.style.display = 'none';
+      const stickyBar = document.getElementById('svsStickyBar');
+      if (stickyBar) stickyBar.style.display = 'none';
+      const progressEl = document.getElementById('svsProgress');
+      if (progressEl) progressEl.style.display = 'none';
+
+      renderStaticSvsList();
+    }
+
+    function renderStaticSvsList() {
+      const results = document.getElementById('svsResults');
+      if (!results) return;
+      results.textContent = '';
+      SVS_STATIC_ITEMS.forEach(item => {
+        const button = document.createElement('button');
+        button.className = 'svs-result';
+        button.type = 'button';
+        button.innerHTML = `<strong></strong><small></small>`;
+        button.querySelector('strong').textContent = item.title;
+        button.querySelector('small').textContent = `ID ${item.id} Â· ${item.date} Â· ${item.type}`;
+        button.addEventListener('click', () => loadSvs(item.id));
+        results.appendChild(button);
+      });
+      svsStatus.textContent = 'NASA Earth Information Center Visualizations (Static Mode)';
+    }
+
+    function debouncedSvsSearch() {
+      if (STATIC_MODE) return;
+      clearTimeout(_svsDebounceTimer);
+      _svsDebounceTimer = setTimeout(() => {
+        svsOffset = 0;
+        searchSvs();
+      }, 300);
+    }
+
+    document.getElementById('openSvsCatalog').addEventListener('click', toggleSvsCatalog);
+    document.getElementById('svsSearch').addEventListener('input', debouncedSvsSearch);
+    document.getElementById('svsSearchButton').addEventListener('click', () => { if (!STATIC_MODE) { svsOffset = 0; searchSvs(); } });
+    document.getElementById('svsSearch').addEventListener('keydown', e => { if (e.key === 'Enter' && !STATIC_MODE) { svsOffset = 0; searchSvs(); } });
+    document.getElementById('svsEicOnly').addEventListener('change', () => { if (!STATIC_MODE) { svsOffset = 0; searchSvs(); } });
+    document.getElementById('svsPrevious').addEventListener('click', () => { if (!STATIC_MODE) { svsOffset = Math.max(0, svsOffset - 24); searchSvs(); } });
+    document.getElementById('svsNext').addEventListener('click', () => { if (!STATIC_MODE && svsOffset + 24 < svsCount) { svsOffset += 24; searchSvs(); } });
+    document.getElementById('svsGenerate').addEventListener('click', generateSvs);
+    document.getElementById('svsCancel').addEventListener('click', cancelSvs);
+
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        catalog.classList.remove('open');
+        document.getElementById('openSvsCatalog').classList.remove('active');
+      }
+    });
+
+    async function searchSvs() {
+      if (STATIC_MODE) {
+        renderStaticSvsList();
+        return;
+      }
+      const qVal = document.getElementById('svsSearch').value.trim();
+      const eicOnly = document.getElementById('svsEicOnly').checked;
+      const cacheKey = `${qVal}::${svsOffset}::${eicOnly}`;
+
+      if (_svsAbortController) {
+        _svsAbortController.abort();
+      }
+      _svsAbortController = new AbortController();
+
+      const results = document.getElementById('svsResults');
+      if (_svsSearchSessionCache.has(cacheKey)) {
+        renderSvsResults(_svsSearchSessionCache.get(cacheKey));
+        return;
+      }
+
+      results.textContent = '';
+      svsStatus.textContent = 'Connecting to NASA SVSâ€¦';
+      try {
+        const q = new URLSearchParams({ q: qVal, offset: svsOffset, limit: 24, eic_only: eicOnly });
+        const response = await fetch(`/api/svs/search?${q}`, { signal: _svsAbortController.signal });
+        if (!response.ok) throw new Error((await response.json()).detail || 'NASA SVS search failed.');
+        const data = await response.json();
+        _svsSearchSessionCache.set(cacheKey, data);
+        renderSvsResults(data);
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        svsStatus.textContent = `NASA SVS catalog: ${error.message}`;
+      }
+    }
+
+    function renderSvsResults(data) {
+      const results = document.getElementById('svsResults');
+      results.textContent = '';
+      svsCount = data.count;
+      data.results.forEach(item => {
+        const button = document.createElement('button');
+        button.className = 'svs-result';
+        button.type = 'button';
+        button.innerHTML = `<strong></strong><small></small>`;
+        button.querySelector('strong').textContent = item.title || `NASA visualization ${item.id}`;
+        button.querySelector('small').textContent = `ID ${item.id} Â· ${item.release_date || 'Date unavailable'} Â· ${item.result_type || 'NASA SVS'}`;
+        button.addEventListener('click', () => loadSvs(item.id));
+        results.appendChild(button);
+      });
+      document.getElementById('svsPrevious').disabled = svsOffset <= 0;
+      document.getElementById('svsNext').disabled = svsOffset + 24 >= svsCount;
+      svsStatus.textContent = `${svsCount.toLocaleString()} matching NASA SVS visualizations.`;
+    }
+
+    async function loadSvs(id) {
+      svsStatus.textContent = 'Retrieving visualization detailsâ€¦';
+      try {
+        let meta = null;
+        if (STATIC_MODE) {
+          try {
+            const res = await fetch(`/svs/${id}/meta.json`);
+            if (res.ok) meta = await res.json();
+          } catch (_) { }
+          if (!meta) {
+            const fallbackItem = SVS_STATIC_ITEMS.find(x => x.id === Number(id));
+            meta = { id, title: fallbackItem?.title || `NASA SVS ${id}`, release_date: fallbackItem?.date || 'unknown' };
+          }
+        } else {
+          const response = await fetch(`${API_BASE}/api/svs/${id}`);
+          if (!response.ok) throw new Error((await response.json()).detail || 'Metadata request failed.');
+          meta = await response.json();
+        }
+        selectedSvs = meta;
+
+        // Pin selected item at top
+        const pinned = document.getElementById('svsPinnedSelection');
+        pinned.classList.add('open');
+        document.getElementById('pinnedTitle').textContent = meta.title || `NASA SVS ${id}`;
+        document.getElementById('pinnedBadge').textContent = `NASA SVS ID ${id}`;
+        document.getElementById('pinnedDesc').textContent = meta.description || 'NASA visualization from Goddard Space Flight Center.';
+        document.getElementById('pinnedMeta').innerHTML = `Released: ${meta.release_date || 'unknown'} Â· <a href="https://svs.gsfc.nasa.gov/${id}/" target="_blank" rel="noopener" style="color:var(--accent);">NASA SVS Page â†—</a>`;
+
+        const videoUrl = STATIC_MODE ? `/svs/${id}/video.mp4` : `${API_BASE}/api/svs/${id}/video`;
+        const mediaDiv = document.getElementById('pinnedMedia');
+        mediaDiv.innerHTML = '';
+        const video = document.createElement('video');
+        video.controls = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.src = videoUrl;
+        video.onerror = () => {
+          mediaDiv.innerHTML = `<p style="padding:10px; font-size:12px; color:var(--muted);">Streaming preview from NASA SVS. <a href="https://svs.gsfc.nasa.gov/${id}/" target="_blank" rel="noopener" style="color:var(--accent);">View on NASA SVS Page ↗</a></p>`;
+        };
+        mediaDiv.appendChild(video);
+        video.play().catch(() => { });
+
+        if (STATIC_MODE) {
+          // Play dist/svs/<id>/video.mp4. If track.mp3 exists, play it; if not, show "No sound built for this visual yet"
+          const audioUrl = `/svs/${id}/track.mp3`;
+          try {
+            const audioCheck = await fetch(audioUrl, { method: 'HEAD' });
+            if (audioCheck.ok) {
+              audio.src = audioUrl;
+              document.getElementById('trackLabel').textContent = `${meta.title || 'NASA SVS'} Â· visual-derived sound`;
+              audio.play().catch(() => { });
+              svsStatus.textContent = 'Playing visualization video & visual-derived sound track.';
+            } else {
+              svsStatus.textContent = 'No sound built for this visual yet';
+            }
+          } catch (_) {
+            svsStatus.textContent = 'No sound built for this visual yet';
+          }
+        } else {
+          document.getElementById('svsGenerate').disabled = false;
+          // When any NASA SVS video is selected: wrap onto globe and extract frames for sonification
+          stopAudio();
+          await cleanupSvsBlobs();
+          svsVideo.crossOrigin = 'anonymous';
+          svsVideo.src = videoUrl;
+          svsVideo.loop = true;
+          svsVideo.muted = true;
+          svsVideo.playsInline = true;
+          svsVideo.load();
+          safePlaySvsVideo();
+          setVisualMode('svs');
+          svsStatus.textContent = `Wrapped NASA SVS ${id} onto globe. Extracting video frames on canvas GPU...`;
+          extractFramesAndSonify(videoUrl, 35, id).catch(err => {
+            console.warn('SVS frame sonification failed on selection:', err);
+          });
+        }
+      } catch (error) {
+        svsStatus.innerHTML = `Could not load visualization. <a href="https://svs.gsfc.nasa.gov/${id}/" target="_blank" rel="noopener" style="color:var(--accent);">View on NASA SVS Page â†—</a>`;
+      }
+    }
+
+    function renderSvsMetaInCard(svsInfo, meta) {
+      const oceanCard = document.getElementById('oceanCard');
+      if (!oceanCard) return;
+      oceanCard.classList.add('open');
+      document.getElementById('ocName').textContent = svsInfo?.title || `NASA SVS ${svsInfo?.id || ''}`;
+      document.getElementById('ocCoords').textContent = `NASA SVS Visualization ID ${svsInfo?.id || ''}`;
+      document.getElementById('ocTempo').textContent = `${meta?.tempo || 108} BPM`;
+      document.getElementById('ocScale').textContent = `${meta?.key || 'D'} ${meta?.scale || meta?.preset?.scale_name || 'Dorian'}`;
+      const totalBars = meta?.bars || meta?.scientific_data?.audit_table?.length || 53;
+      document.getElementById('ocBars').textContent = `${totalBars} bars`;
+      document.getElementById('ocDuration').textContent = `${Math.round(meta?.duration_s || audio.duration || 60)}s`;
+
+      const dsName = meta?.scientific_data?.dataset?.name || 'NASA Scientific Visualization Studio';
+      const dsFields = (meta?.scientific_data?.dataset?.fields_used || []).join(', ') || 'Video frames (color & luminosity)';
+      const gmProgs = meta?.gm_programs ? Object.entries(meta.gm_programs).map(([k, v]) => `${k}:${v}`).join(', ') : 'GM SoundFont';
+      document.getElementById('ocScientificSummary').innerHTML = `
+        <strong>Dataset:</strong> ${dsName}<br/>
+        <strong>Fields:</strong> ${dsFields}<br/>
+        <strong>Bar Count:</strong> ${totalBars} bars<br/>
+        <strong>Tempo:</strong> ${meta?.tempo || 108} BPM Â· Key: ${meta?.key || 'D'} ${meta?.scale || ''}<br/>
+        <strong>Instruments:</strong> ${gmProgs}
+      `;
+
+      const factsText = meta?.facts_narrative?.text || 'Derived from satellite data; every note is computed from the data by rules we chose.';
+      const factsCitations = (meta?.facts_narrative?.facts_used || []).join(', ');
+      document.getElementById('ocFacts').innerHTML = `
+        ${factsText}
+        ${factsCitations ? `<div style="font-size:10px; color:var(--muted); margin-top:3px;">Audit row citations: bars [${factsCitations}]</div>` : ''}
+      `;
+
+      document.getElementById('ocStoryLabel').textContent = meta?.story?.label || 'Artistic interpretation â€” not a scientific claim';
+      document.getElementById('ocStory').textContent = meta?.story?.text || 'Visual frames mapped into musical dynamics and pitch contours.';
+      document.getElementById('ocCulturalFrame').textContent = meta?.cultural_frame || 'Scientific Visualization Sonification';
+
+      document.getElementById('ocLimits').innerHTML = `
+        <strong>Honest Limits:</strong> ${meta?.scientific_data?.honest_limits || 'Derived from satellite data; sonified by rules we chose.'}<br/>
+        <strong>AI Disclosure:</strong> ${meta?.ai_disclosure || 'Every note is computed from the data by rules we chose.'}
+      `;
+
+      const viewAudit = document.getElementById('viewAudit');
+      if (viewAudit && viewAudit.classList.contains('active')) {
+        renderAuditRowsFromData(meta?.scientific_data?.audit_table || []);
+      }
+    }
+
+    // SVS PAIR: Wrap globe texture from temporary video blob & generate synchronized sound
+    async function pairSelectedSvsWithSoundscape() {
+      if (!selectedSvs) return;
+
+      // 1. Immediately stop/pause any active region track (do NOT auto-play pre-rendered region audio)
+      stopAudio();
+
+      // 2. Load SVS video stream via same-origin backend proxy
+      const videoUrl = STATIC_MODE ? `/svs/${selectedSvs.id}/video.mp4` : `${API_BASE}/api/svs/${selectedSvs.id}/video`;
+      svsStatus.textContent = 'Loading SVS video stream into browser memory...';
+      try {
+        const vRes = await fetch(videoUrl);
+        if (!vRes.ok) throw new Error(`Video fetch failed with status ${vRes.status}`);
+        const vBlob = await vRes.blob();
+        await cleanupSvsBlobs();
+        svsVideo.crossOrigin = 'anonymous';
+        currentSvsVideoBlobUrl = URL.createObjectURL(vBlob);
+        svsVideo.src = currentSvsVideoBlobUrl;
+      } catch (err) {
+        console.warn('Video blob fetch failed, falling back to direct URL:', err);
+        await cleanupSvsBlobs();
+        svsVideo.crossOrigin = 'anonymous';
+        svsVideo.src = videoUrl;
+      }
+
+      svsVideo.loop = true;
+      svsVideo.muted = true;
+      svsVideo.playsInline = true;
+      svsVideo.load();
+      safePlaySvsVideo();
+
+      // Wrap 3D globe material using THREE.VideoTexture
+      setVisualMode('svs');
+      svsStatus.textContent = `Wrapped SVS ${selectedSvs.id} onto 3D globe. Extracting video frames on canvas GPU...`;
+
+      extractFramesAndSonify(svsVideo.src, 35, selectedSvs.id).catch(err => {
+        console.warn('SVS frame sonification failed:', err);
+      });
+    }
+
+    async function autoSearchAndPairSvs(query, overrideId = null, spokenReply = null) {
+      duckMusicGain(0.18, 200);
+      stopAudio();
+
+      let targetId = overrideId;
+      let targetTitle = "";
+
+      if (!targetId) {
+        try {
+          const res = await fetch(`${API_BASE}/api/svs/search?search=${encodeURIComponent(query)}&limit=10`);
+          if (res.ok) {
+            const data = await res.json();
+            const results = data.results || [];
+            if (results.length > 0) {
+              targetId = String(results[0].id);
+              targetTitle = results[0].title || `NASA SVS ${targetId}`;
+              selectedSvs = results[0];
+            }
+          }
+        } catch (e) {
+          console.warn('Auto search SVS error:', e);
+        }
+      }
+
+      if (!targetId) {
+        targetId = (query.includes('ocean') || query.includes('current')) ? '3912' : '5688';
+        targetTitle = `NASA SVS ${targetId}`;
+      }
+
+      const speech = spokenReply || `Loading NASA SVS ${targetId} for ${query}. Pairing visual animation with soundscape derived from satellite data.`;
+      speakVoicePrompt(speech);
+
+      const videoProxyUrl = `${API_BASE}/api/svs/${targetId}/video`;
+      await cleanupSvsBlobs();
+      svsVideo.crossOrigin = 'anonymous';
+      svsVideo.src = videoProxyUrl;
+      svsVideo.loop = true;
+      svsVideo.muted = true;
+      svsVideo.playsInline = true;
+      svsVideo.load();
+      safePlaySvsVideo();
+
+      setVisualMode('svs');
+
+      const statusEl = document.getElementById('svsStatus');
+      if (statusEl) statusEl.textContent = `Auto-paired NASA SVS ${targetId}. Extracting video frames on canvas GPU...`;
+
+      try {
+        await extractFramesAndSonify(videoProxyUrl, 35, targetId);
+      } catch (err) {
+        console.warn('Auto-pair frame sonification failed:', err);
+      }
+    }
+
+    // SVS GENERATE: Disabled in static mode
+    async function generateSvs() {
+      if (STATIC_MODE) return;
+      if (!selectedSvs) return;
+      const button = document.getElementById('svsGenerate');
+      button.disabled = true;
+      initWebAudio();
+      if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+      const videoUrl = `${API_BASE}/api/svs/${selectedSvs.id}/video`;
+      try {
+        await extractFramesAndSonify(videoUrl, 35, selectedSvs.id);
+      } catch (error) {
+        svsStatus.textContent = `Failed: ${error.message}`;
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function pollSvs() {
+      if (STATIC_MODE || !svsJob) return;
+      try {
+        const response = await fetch(`${API_BASE}/api/svs/jobs/${svsJob}`);
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || 'Job lookup failed.');
+        }
+        const job = await response.json();
+        const p = job.progress || {};
+        const stageMap = {
+          queued: 'Queued',
+          downloading: 'Downloading NASA media',
+          retrieving_metadata: 'Downloading NASA media',
+          analysing: 'Analysing frames',
+          processing_frames: 'Analysing frames',
+          rendering: 'Rendering audio',
+          rendering_audio: 'Rendering audio',
+          done: 'Done',
+          complete: 'Done',
+          failed: 'Failed'
+        };
+        const stageName = stageMap[job.status] || job.status;
+        svsStatus.textContent = p.total ? `${stageName}: ${p.current} of ${p.total}` : stageName;
+        const progress = document.getElementById('svsProgress');
+        progress.max = Math.max(1, p.total || 1);
+        progress.value = Math.min(progress.max, p.current || 0);
+
+        if (job.status === 'done' || job.status === 'complete') {
+          const finishedJobId = svsJob;
+          clearInterval(svsPoll); svsPoll = null; svsJob = null;
+          document.getElementById('svsCancel').hidden = true;
+          document.getElementById('svsGenerate').disabled = false;
+
+          const rawAudioUrl = (job.result.audio_url && job.result.audio_url.startsWith('http'))
+            ? job.result.audio_url
+            : `${API_BASE}${job.result.audio_url}`;
+
+          // Fetch generated .opus audio into a temporary browser Blob (URL.createObjectURL)
+          try {
+            const aRes = await fetch(rawAudioUrl);
+            if (aRes.ok) {
+              const aBlob = await aRes.blob();
+              if (currentSvsAudioBlobUrl) URL.revokeObjectURL(currentSvsAudioBlobUrl);
+              currentSvsAudioBlobUrl = URL.createObjectURL(aBlob);
+              audio.src = currentSvsAudioBlobUrl;
+            } else {
+              audio.src = rawAudioUrl;
+            }
+          } catch (e) {
+            audio.src = rawAudioUrl;
+          }
+          audio.loop = true;
+          audio.play().catch(() => { });
+          document.getElementById('trackLabel').textContent = `${selectedSvs?.title || 'NASA SVS'} Â· visual-derived sound`;
+
+          // Display SVS meta.json (honest_limits, facts_narrative, audit_table)
+          const metaUrl = job.result.meta_url || job.result.audit_url;
+          if (metaUrl) {
+            const fullMeta = metaUrl.startsWith('http') ? metaUrl : `${API_BASE}${metaUrl}`;
+            try {
+              const mRes = await fetch(fullMeta);
+              if (mRes.ok) {
+                const mData = await mRes.json();
+                currentMeta = mData;
+                renderSvsMetaInCard(selectedSvs, mData);
+              }
+            } catch (_) { }
+          }
+          svsStatus.textContent = 'Done. Generated sound is playing synchronized with wrapped globe visual.';
+
+          // Backend cleanup: delete temporary files so server stores nothing permanently
+          if (finishedJobId) {
+            fetch(`${API_BASE}/api/svs/jobs/${finishedJobId}`, { method: 'DELETE' }).catch(() => { });
+          }
+        } else if (['failed', 'cancelled'].includes(job.status)) {
+          clearInterval(svsPoll); svsPoll = null; svsJob = null;
+          document.getElementById('svsCancel').hidden = true;
+          document.getElementById('svsGenerate').disabled = false;
+          svsStatus.textContent = job.status === 'cancelled' ? 'Processing cancelled.' : `Failed: ${job.error || 'Server error'}`;
+        }
+      } catch (error) {
+        svsStatus.textContent = `Failed: ${error.message}`;
+      }
+    }
+
+    async function cancelSvs() {
+      if (STATIC_MODE) return;
+      if (svsJob) {
+        const jId = svsJob;
+        clearInterval(svsPoll); svsPoll = null; svsJob = null;
+        await fetch(`${API_BASE}/api/svs/jobs/${jId}`, { method: 'DELETE' }).catch(() => { });
+      }
+      document.getElementById('svsCancel').hidden = true;
+      document.getElementById('svsGenerate').disabled = false;
+      svsStatus.textContent = 'Cancelled frame processing.';
+    }
+
+    window.addEventListener('beforeunload', cleanupSvsBlobs);
+
+    // ==========================================
+    // STEP 2: VOICE GUIDANCE, GPU FRAME EXTRACTOR & WARMUP LOADER
+    // ==========================================
+    let voiceModalOpen = true;
+    let voiceGuidanceEnabled = false;
+    let isSpaceHeld = false;
+    let speechRecognizer = null;
+    let speechTranscript = '';
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let micStream = null;
+
+    const kokoroVoicePlayer = document.getElementById('kokoroVoicePlayer') || new Audio();
+    const voiceAudio = kokoroVoicePlayer;
+    let stage1Url = null;
+    let stage2Url = null;
+    let welcomeAudioPlayed = false;
+
+    function base64ToBlobUrl(base64, mime = 'audio/ogg; codecs=opus') {
+      try {
+        const binaryString = atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return URL.createObjectURL(new Blob([bytes], { type: mime }));
+      } catch (e) {
+        console.warn('Base64 to blob conversion failed:', e);
+        return `data:${mime};base64,${base64}`;
+      }
+    }
+
+    async function prefetchWelcomeAudios() {
+      try {
+        const [res1, res2] = await Promise.all([
+          fetch(`${API_BASE}/api/welcome-audio?stage=1`),
+          fetch(`${API_BASE}/api/welcome-audio?stage=2`)
+        ]);
+        if (res1.ok) {
+          const d1 = await res1.json();
+          if (d1.audio_base64) stage1Url = base64ToBlobUrl(d1.audio_base64);
+        }
+        if (res2.ok) {
+          const d2 = await res2.json();
+          if (d2.audio_base64) stage2Url = base64ToBlobUrl(d2.audio_base64);
+        }
+        playStage1Prompt();
+      } catch (err) {
+        console.warn('Pre-fetch welcome audio failed:', err);
+      }
+    }
+
+    function playStage1Prompt() {
+      if (welcomeAudioPlayed || !voiceModalOpen || !stage1Url) return;
+      kokoroVoicePlayer.src = stage1Url;
+      const p = kokoroVoicePlayer.play();
+      if (p !== undefined) {
+        p.then(() => {
+          welcomeAudioPlayed = true;
+        }).catch((e) => {
+          console.warn('Autoplay blocked before gesture:', e);
+        });
+      }
+    }
+
+    function onFirstGestureForWelcome(e) {
+      if (e && (e.key === 'Enter' || e.key === 'Escape')) return;
+      if (!welcomeAudioPlayed && voiceModalOpen && stage1Url) {
+        playStage1Prompt();
+      }
+    }
+    window.addEventListener('pointerdown', onFirstGestureForWelcome);
+    window.addEventListener('keydown', onFirstGestureForWelcome);
+
+    // Trigger pre-fetch immediately on page load
+    prefetchWelcomeAudios();
+
+    function setAudioVolume(vol) {
+      audio.volume = Math.min(1.0, Math.max(0.0, vol));
+    }
+
+    function duckMusicVolume(targetGain = 0.18, durationMs = 200) {
+      duckMusicGain(targetGain, durationMs);
+    }
+
+    function restoreMusicVolume(targetGain = 1.0, durationMs = 400) {
+      restoreMusicGain(targetGain, durationMs);
+    }
+
+    async function activateVoiceGuidance(enable) {
+      const modal = document.getElementById('voiceModal');
+      if (modal) {
+        modal.style.opacity = '0';
+        setTimeout(() => modal.classList.add('hidden'), 280);
+      }
+      voiceModalOpen = false;
+      voiceGuidanceEnabled = !!enable;
+
+      if (voiceGuidanceEnabled) {
+        // 1) Immediately unlock AudioContext inside user gesture
+        initWebAudio();
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+
+        // 2) Stop any Stage 1 audio cleanly and IMMEDIATELY assign kokoroVoicePlayer.src = stage2Url
+        // and call await kokoroVoicePlayer.play() synchronously inside the user gesture
+        try {
+          kokoroVoicePlayer.pause();
+          kokoroVoicePlayer.currentTime = 0;
+        } catch (_) {}
+
+        if (stage2Url) {
+          kokoroVoicePlayer.src = stage2Url;
+          try {
+            await kokoroVoicePlayer.play();
+          } catch (err) {
+            console.warn('Stage 2 playback blocked or error:', err);
+          }
+        } else {
+          try {
+            const res = await fetch(`${API_BASE}/api/welcome-audio?stage=2`);
+            if (res.ok) {
+              const d2 = await res.json();
+              if (d2.audio_base64) {
+                stage2Url = base64ToBlobUrl(d2.audio_base64);
+                kokoroVoicePlayer.src = stage2Url;
+                await kokoroVoicePlayer.play();
+              }
+            }
+          } catch (e) {
+            console.warn('Stage 2 fetch fallback error:', e);
+          }
+        }
+      } else {
+        try {
+          kokoroVoicePlayer.pause();
+          kokoroVoicePlayer.currentTime = 0;
+        } catch (_) {}
+      }
+    }
+    window.activateVoiceGuidance = activateVoiceGuidance;
+    if (typeof window.__pendingVoiceGuidance !== 'undefined') {
+      const pending = window.__pendingVoiceGuidance;
+      delete window.__pendingVoiceGuidance;
+      activateVoiceGuidance(pending);
+    }
+    document.getElementById('btnVoiceNo')?.addEventListener('click', () => activateVoiceGuidance(false));
+    document.getElementById('btnVoiceYes')?.addEventListener('click', () => activateVoiceGuidance(true));
+
+    async function initMicrophone() {
+      if (micStream) return micStream;
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        return micStream;
+      } catch (err) {
+        console.warn('Microphone access denied:', err);
+        return null;
+      }
+    }
+
+    function initSpeechRecognition() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) return null;
+      const rec = new SpeechRec();
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.lang = 'en-US';
+      rec.onresult = (evt) => {
+        if (evt.results && evt.results[0] && evt.results[0][0]) {
+          speechTranscript = evt.results[0][0].transcript;
+        }
+      };
+      rec.onerror = (err) => {
+        console.warn('SpeechRecognition error:', err);
+      };
+      return rec;
+    }
+
+    async function speakVoicePrompt(text, onComplete = null) {
+      duckMusicGain(0.18, 200);
+      let finished = false;
+      function onDone() {
+        if (finished) return;
+        finished = true;
+        restoreMusicGain(1.0, 400);
+        if (onComplete) onComplete();
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/voice-navigate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ transcript: text, active_region_id: currentTrackId })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.audio_base64) {
+            kokoroVoicePlayer.src = `data:audio/ogg;codecs=opus;base64,${data.audio_base64}`;
+            kokoroVoicePlayer.onended = onDone;
+            kokoroVoicePlayer.onerror = onDone;
+            await safePlayAudio(kokoroVoicePlayer);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Kokoro TTS prompt failed:', err);
+      }
+
+      // Kokoro-82M native TTS, zero browser TTS fallback
+      setTimeout(onDone, 800);
+    }
+
+    const REGION_CENTERS = [
+      { id: 'gulf_stream', name: 'North Atlantic (Gulf Stream)', lat: 35.0, lon: -70.0 },
+      { id: 'kuroshio', name: 'North Pacific (Kuroshio)', lat: 34.0, lon: 145.0 },
+      { id: 'east_australian', name: 'South Pacific (East Australian Current)', lat: -32.5, lon: 160.0 },
+      { id: 'brazil_malvinas', name: 'South Atlantic (Brazil-Malvinas)', lat: -42.5, lon: -50.0 },
+      { id: 'arabian_sea', name: 'Indian Ocean (Arabian Sea)', lat: 15.0, lon: 62.5 },
+      { id: 'drake_acc', name: 'Southern Ocean (Drake Passage / ACC)', lat: -60.0, lon: -60.0 },
+      { id: 'nordic_seas', name: 'Arctic (Nordic Seas)', lat: 68.5, lon: 2.5 },
+      { id: 'amazon', name: 'South America (Amazon Basin)', lat: -9.0, lon: -55.0 },
+      { id: 'congo', name: 'Central Africa (Congo Basin)', lat: 0.0, lon: 22.5 },
+      { id: 'se_asia', name: 'Southeast Asia (Indochina)', lat: 17.0, lon: 102.0 },
+      { id: 'australia', name: 'Eastern Australia', lat: -27.5, lon: 140.0 },
+      { id: 'w_north_america', name: 'Western North America', lat: 41.5, lon: -120.0 },
+      { id: 'siberia', name: 'Northern Asia (Siberia)', lat: 60.0, lon: 107.5 },
+      { id: 'india', name: 'South Asia (India)', lat: 23.0, lon: 79.0 },
+      { id: 'europe', name: 'Southern Europe / Mediterranean', lat: 41.0, lon: 3.5 }
+    ];
+
+    const REGION_FUZZY_ALIASES = {
+      gulf_stream: ['gulf stream', 'north atlantic', 'florida', 'gulf of mexico'],
+      kuroshio: ['kuroshio', 'north pacific', 'japan current', 'pacific current'],
+      east_australian: ['east australian', 'south pacific', 'tasman', 'sydney current'],
+      brazil_malvinas: ['brazil', 'malvinas', 'south atlantic', 'falkland'],
+      arabian_sea: ['arabian sea', 'indian ocean', 'arabian', 'persian gulf', 'red sea', 'uae', 'dubai', 'abu dhabi', 'sharjah'],
+      drake_acc: ['drake', 'southern ocean', 'antarctic circumpolar', 'acc', 'antarctica'],
+      nordic_seas: ['nordic', 'nordic seas', 'norwegian sea', 'greenland sea', 'arctic', 'greenland', 'iceland', 'norway'],
+      amazon: ['amazon', 'amazonas', 'rainforest', 'south america'],
+      congo: ['congo', 'congo basin', 'central africa', 'zaire'],
+      se_asia: ['se asia', 'southeast asia', 'indochina', 'mekong', 'indonesia', 'vietnam', 'thailand', 'malaysia', 'philippines'],
+      australia: ['australia', 'outback', 'bush', 'queensland'],
+      w_north_america: ['western north america', 'california', 'oregon', 'washington', 'rockies', 'pacific northwest'],
+      siberia: ['siberia', 'taiga', 'russian far east', 'lake baikal'],
+      india: ['india', 'hindustan', 'bharat', 'ganges', 'deccan'],
+      europe: ['europe', 'mediterranean', 'iberia', 'france', 'germany', 'italy', 'spain', 'alps']
+    };
+
+    const WORLD_PLACES = {
+      "uae": { name: "United Arab Emirates", lat: 24.0, lon: 54.0 },
+      "united arab emirates": { name: "United Arab Emirates", lat: 24.0, lon: 54.0 },
+      "dubai": { name: "Dubai", lat: 25.2, lon: 55.3 },
+      "abu dhabi": { name: "Abu Dhabi", lat: 24.45, lon: 54.37 },
+      "sharjah": { name: "Sharjah", lat: 25.35, lon: 55.4 },
+      "saudi arabia": { name: "Saudi Arabia", lat: 23.88, lon: 45.07 },
+      "riyadh": { name: "Riyadh", lat: 24.71, lon: 46.67 },
+      "qatar": { name: "Qatar", lat: 25.35, lon: 51.18 },
+      "doha": { name: "Doha", lat: 25.28, lon: 51.53 },
+      "oman": { name: "Oman", lat: 21.51, lon: 55.92 },
+      "kuwait": { name: "Kuwait", lat: 29.31, lon: 47.48 },
+      "persian gulf": { name: "Persian Gulf", lat: 26.0, lon: 52.0 },
+      "red sea": { name: "Red Sea", lat: 20.0, lon: 38.5 },
+      "arabian sea": { name: "Arabian Sea", lat: 15.0, lon: 65.0 },
+      "japan": { name: "Japan", lat: 36.2, lon: 138.25 },
+      "tokyo": { name: "Tokyo", lat: 35.68, lon: 139.76 },
+      "kyoto": { name: "Kyoto", lat: 35.01, lon: 135.76 },
+      "osaka": { name: "Osaka", lat: 34.69, lon: 135.50 },
+      "korea": { name: "Korea", lat: 36.5, lon: 127.5 },
+      "seoul": { name: "Seoul", lat: 37.56, lon: 126.97 },
+      "china": { name: "China", lat: 35.86, lon: 104.19 },
+      "beijing": { name: "Beijing", lat: 39.90, lon: 116.40 },
+      "shanghai": { name: "Shanghai", lat: 31.23, lon: 121.47 },
+      "hong kong": { name: "Hong Kong", lat: 22.31, lon: 114.16 },
+      "taiwan": { name: "Taiwan", lat: 23.69, lon: 120.96 },
+      "singapore": { name: "Singapore", lat: 1.35, lon: 103.81 },
+      "thailand": { name: "Thailand", lat: 15.87, lon: 100.99 },
+      "bangkok": { name: "Bangkok", lat: 13.75, lon: 100.50 },
+      "vietnam": { name: "Vietnam", lat: 14.05, lon: 108.27 },
+      "philippines": { name: "Philippines", lat: 12.87, lon: 121.77 },
+      "indonesia": { name: "Indonesia", lat: -0.78, lon: 113.92 },
+      "jakarta": { name: "Jakarta", lat: -6.20, lon: 106.84 },
+      "india": { name: "India", lat: 20.59, lon: 78.96 },
+      "new delhi": { name: "New Delhi", lat: 28.61, lon: 77.20 },
+      "delhi": { name: "Delhi", lat: 28.61, lon: 77.20 },
+      "mumbai": { name: "Mumbai", lat: 19.07, lon: 72.87 },
+      "bangalore": { name: "Bangalore", lat: 12.97, lon: 77.59 },
+      "uk": { name: "United Kingdom", lat: 55.37, lon: -3.43 },
+      "united kingdom": { name: "United Kingdom", lat: 55.37, lon: -3.43 },
+      "britain": { name: "Britain", lat: 55.37, lon: -3.43 },
+      "england": { name: "England", lat: 52.35, lon: -1.17 },
+      "london": { name: "London", lat: 51.5, lon: -0.12 },
+      "france": { name: "France", lat: 46.22, lon: 2.21 },
+      "paris": { name: "Paris", lat: 48.85, lon: 2.35 },
+      "germany": { name: "Germany", lat: 51.16, lon: 10.45 },
+      "berlin": { name: "Berlin", lat: 52.52, lon: 13.40 },
+      "italy": { name: "Italy", lat: 41.87, lon: 12.56 },
+      "rome": { name: "Rome", lat: 41.90, lon: 12.49 },
+      "spain": { name: "Spain", lat: 40.46, lon: -3.74 },
+      "madrid": { name: "Madrid", lat: 40.41, lon: -3.70 },
+      "barcelona": { name: "Barcelona", lat: 41.38, lon: 2.17 },
+      "greece": { name: "Greece", lat: 39.07, lon: 21.82 },
+      "athens": { name: "Athens", lat: 37.98, lon: 23.72 },
+      "norway": { name: "Norway", lat: 60.47, lon: 8.46 },
+      "oslo": { name: "Oslo", lat: 59.91, lon: 10.75 },
+      "sweden": { name: "Sweden", lat: 60.12, lon: 18.64 },
+      "stockholm": { name: "Stockholm", lat: 59.32, lon: 18.06 },
+      "iceland": { name: "Iceland", lat: 64.96, lon: -19.02 },
+      "europe": { name: "Europe", lat: 48.0, lon: 12.0 },
+      "mediterranean": { name: "Mediterranean Sea", lat: 35.0, lon: 18.0 },
+      "baltic": { name: "Baltic Sea", lat: 58.0, lon: 20.0 },
+      "black sea": { name: "Black Sea", lat: 43.0, lon: 35.0 },
+      "usa": { name: "United States", lat: 37.09, lon: -95.71 },
+      "united states": { name: "United States", lat: 37.09, lon: -95.71 },
+      "america": { name: "America", lat: 37.09, lon: -95.71 },
+      "new york": { name: "New York", lat: 40.71, lon: -74.00 },
+      "california": { name: "California", lat: 36.77, lon: -119.41 },
+      "los angeles": { name: "Los Angeles", lat: 34.05, lon: -118.24 },
+      "san francisco": { name: "San Francisco", lat: 37.77, lon: -122.41 },
+      "chicago": { name: "Chicago", lat: 41.87, lon: -87.62 },
+      "miami": { name: "Miami", lat: 25.76, lon: -80.19 },
+      "florida": { name: "Florida", lat: 27.66, lon: -81.51 },
+      "texas": { name: "Texas", lat: 31.96, lon: -99.90 },
+      "seattle": { name: "Seattle", lat: 47.60, lon: -122.33 },
+      "canada": { name: "Canada", lat: 56.13, lon: -106.34 },
+      "toronto": { name: "Toronto", lat: 43.65, lon: -79.38 },
+      "vancouver": { name: "Vancouver", lat: 49.28, lon: -123.12 },
+      "mexico": { name: "Mexico", lat: 23.63, lon: -102.55 },
+      "brazil": { name: "Brazil", lat: -14.23, lon: -51.92 },
+      "rio": { name: "Rio de Janeiro", lat: -22.90, lon: -43.17 },
+      "rio de janeiro": { name: "Rio de Janeiro", lat: -22.90, lon: -43.17 },
+      "sao paulo": { name: "Sao Paulo", lat: -23.55, lon: -46.63 },
+      "argentina": { name: "Argentina", lat: -38.41, lon: -63.61 },
+      "buenos aires": { name: "Buenos Aires", lat: -34.60, lon: -58.38 },
+      "amazon": { name: "Amazon Rainforest", lat: -3.46, lon: -62.21 },
+      "atlantic": { name: "Atlantic Ocean", lat: 25.0, lon: -40.0 },
+      "north atlantic": { name: "North Atlantic", lat: 35.0, lon: -45.0 },
+      "south atlantic": { name: "South Atlantic", lat: -30.0, lon: -20.0 },
+      "caribbean": { name: "Caribbean Sea", lat: 15.0, lon: -75.0 },
+      "gulf stream": { name: "Gulf Stream", lat: 35.0, lon: -70.0 },
+      "africa": { name: "Africa", lat: 2.0, lon: 20.0 },
+      "egypt": { name: "Egypt", lat: 26.82, lon: 30.80 },
+      "cairo": { name: "Cairo", lat: 30.04, lon: 31.23 },
+      "south africa": { name: "South Africa", lat: -30.55, lon: 22.93 },
+      "cape town": { name: "Cape Town", lat: -33.92, lon: 18.42 },
+      "kenya": { name: "Kenya", lat: -0.02, lon: 37.90 },
+      "congo": { name: "Congo Basin", lat: 0.0, lon: 22.0 },
+      "australia": { name: "Australia", lat: -25.27, lon: 133.77 },
+      "sydney": { name: "Sydney", lat: -33.86, lon: 151.20 },
+      "melbourne": { name: "Melbourne", lat: -37.81, lon: 144.96 },
+      "new zealand": { name: "New Zealand", lat: -40.90, lon: 174.88 },
+      "auckland": { name: "Auckland", lat: -36.84, lon: 174.76 },
+      "arctic": { name: "Arctic", lat: 80.0, lon: 0.0 },
+      "greenland": { name: "Greenland", lat: 71.7, lon: -42.6 },
+      "antarctica": { name: "Antarctica", lat: -80.0, lon: 0.0 },
+      "pacific": { name: "Pacific Ocean", lat: 0.0, lon: -160.0 },
+      "indian ocean": { name: "Indian Ocean", lat: -10.0, lon: 75.0 }
+    };
+
+    function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return Math.round(R * c);
+    }
+
+    async function handleClientVoiceCommand(rawTranscript) {
+      const text = (rawTranscript || '').trim().toLowerCase().replace(/[.,!?;:]/g, '');
+      if (!text) {
+        restoreMusicGain(1.0, 400);
+        return false;
+      }
+
+      // 1. Play / Pause / Transport
+      if (text === 'pause' || text === 'pause music' || text === 'stop') {
+        if (!audio.paused) togglePlay();
+        speakVoicePrompt("Paused music.");
+        return true;
+      }
+      if (text === 'play' || text === 'play music' || text === 'resume' || text === 'start') {
+        if (audio.paused) togglePlay();
+        speakVoicePrompt("Resumed playback.");
+        return true;
+      }
+
+      // 2. Explain more about this place
+      if (text.includes('explain') || text.includes('tell me more') || text.includes('about this')) {
+        let explanation = "";
+        if (currentMeta) {
+          if (currentMeta.story && currentMeta.story.text) {
+            explanation += currentMeta.story.text + " ";
+          }
+          if (currentMeta.facts_narrative && currentMeta.facts_narrative.text) {
+            explanation += currentMeta.facts_narrative.text + " ";
+          }
+          if (currentMeta.honest_limits) {
+            explanation += "Honest limits: " + currentMeta.honest_limits;
+          } else if (currentMeta.scientific_data && currentMeta.scientific_data.honest_limits) {
+            explanation += "Honest limits: " + currentMeta.scientific_data.honest_limits;
+          }
+        }
+        if (!explanation) {
+          explanation = "Every note is computed from the data by rules we chose.";
+        }
+        speakVoicePrompt(explanation);
+        return true;
+      }
+
+      // 3. SVS search / auto-pair: "search <topic>", "find <topic>", "show <topic> svs", "go to <topic> svs data"
+      const isSvsCommand = text.includes('svs') || text.includes('wildfire') || text.includes('smoke') || text.includes('perpetual ocean') || text.startsWith('search ') || text.startsWith('find ') || text.startsWith('show ');
+      if (isSvsCommand) {
+        const cleanedQuery = text.replace(/^(?:search|find|show|look for|pair with|go to)\s+(?:for\s+)?/i, '')
+                                .replace(/\b(svs|visualization|visualizations|data|video)\b/gi, '')
+                                .trim() || 'smoke';
+        await autoSearchAndPairSvs(cleanedQuery);
+        return true;
+      }
+
+      // 4. Pair with visual / Wrap globe
+      if (text.includes('pair with visual') || text.includes('pair visual') || text.includes('generate svs') || text.includes('wrap globe')) {
+        const q = (selectedSvs && selectedSvs.title) ? selectedSvs.title : 'smoke';
+        await autoSearchAndPairSvs(q, selectedSvs ? selectedSvs.id : '5688');
+        return true;
+      }
+
+      // 5. Place & Fuzzy Region Navigation: "go to <place>", "navigate to <place>", "fly to <place>"
+      let placeQuery = text;
+      const navMatch = text.match(/^(?:go to|navigate to|fly to|take me to|zoom to|visit|explore)\s+(.+)/);
+      if (navMatch) {
+        placeQuery = navMatch[1].trim();
+      }
+
+      // Check direct region alias match
+      for (const [rid, aliases] of Object.entries(REGION_FUZZY_ALIASES)) {
+        for (const alias of aliases) {
+          if (placeQuery === alias || placeQuery.includes(alias) || alias.includes(placeQuery)) {
+            const regObj = REGION_CENTERS.find(r => r.id === rid);
+            await selectAndPlayTrack(rid);
+            speakVoicePrompt(`Navigating to ${regObj?.name || rid}. Every note is computed from the data by rules we chose.`);
+            return true;
+          }
+        }
+      }
+
+      // Check world places dictionary
+      for (const [key, place] of Object.entries(WORLD_PLACES)) {
+        if (placeQuery === key || placeQuery.includes(key) || key.includes(placeQuery)) {
+          let nearest = null;
+          let minDist = Infinity;
+          for (const reg of REGION_CENTERS) {
+            const dist = haversineDistanceKm(place.lat, place.lon, reg.lat, reg.lon);
+            if (dist < minDist) {
+              minDist = dist;
+              nearest = reg;
+            }
+          }
+          if (nearest) {
+            await selectAndPlayTrack(nearest.id);
+            speakVoicePrompt(`Navigating to ${place.name}. Matched nearest region ${nearest.name}, ${minDist.toLocaleString()} kilometers away.`);
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    async function startVoiceCapture() {
+      try {
+        if (kokoroVoicePlayer) {
+          kokoroVoicePlayer.pause();
+        }
+      } catch (_) {}
+      duckMusicGain(0.05, 80);
+      speechTranscript = '';
+      audioChunks = [];
+      const mic = document.getElementById('micIndicator');
+      if (mic) mic.classList.add('active');
+
+      // 1. Primary: browser SpeechRecognition for fast text transcript
+      try {
+        if (!speechRecognizer) speechRecognizer = initSpeechRecognition();
+        if (speechRecognizer) speechRecognizer.start();
+      } catch (err) {
+        console.warn('Speech recognition start failed:', err);
+      }
+
+      // 2. Fallback: buffer MediaRecorder audio stream
+      const stream = await initMicrophone();
+      if (stream && typeof MediaRecorder !== 'undefined') {
+        let mimeType = 'audio/webm;codecs=opus';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/webm';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = '';
+          }
+        }
+        try {
+          mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+              audioChunks.push(e.data);
+            }
+          };
+          mediaRecorder.start();
+        } catch (e) {
+          console.warn('MediaRecorder start failed:', e);
+        }
+      }
+    }
+
+    function stopVoiceCapture() {
+      const mic = document.getElementById('micIndicator');
+      if (mic) mic.classList.remove('active');
+
+      if (speechRecognizer) {
+        try { speechRecognizer.stop(); } catch (_) { }
+      }
+
+      setTimeout(async () => {
+        const transcript = speechTranscript.trim();
+        if (transcript) {
+          // Fast primary path: send text transcript immediately to backend
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            try { mediaRecorder.stop(); } catch (_) { }
+          }
+          audioChunks = [];
+          try {
+            const res = await fetch(`${API_BASE}/api/voice-navigate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                transcript: transcript,
+                active_region_id: currentTrackId
+              })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              executeVoiceAction(data);
+            } else {
+              restoreMusicGain(1.0, 400);
+            }
+          } catch (err) {
+            console.warn('Voice navigate error:', err);
+            showStatusNotice('Backend offline — start server or check API URL');
+            restoreMusicGain(1.0, 400);
+          }
+          return;
+        }
+
+        // Fallback: send recorded audio chunks if speech transcript was empty
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.onstop = async () => {
+            const mime = mediaRecorder.mimeType || 'audio/webm';
+            const audioBlob = new Blob(audioChunks, { type: mime });
+            audioChunks = [];
+            if (audioBlob.size < 200) {
+              restoreMusicGain(1.0, 400);
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+              const resultStr = reader.result || '';
+              const base64Audio = resultStr.includes(',') ? resultStr.split(',')[1] : resultStr;
+              try {
+                const res = await fetch(`${API_BASE}/api/voice-navigate`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    audio_base64: base64Audio,
+                    mime_type: audioBlob.type || 'audio/webm',
+                    active_region_id: currentTrackId
+                  })
+                });
+                if (res.ok) {
+                  const data = await res.json();
+                  executeVoiceAction(data);
+                } else {
+                  restoreMusicGain(1.0, 400);
+                }
+              } catch (err) {
+                console.warn('Voice navigate audio error:', err);
+                showStatusNotice('Backend offline — start server or check API URL');
+                restoreMusicGain(1.0, 400);
+              }
+            };
+            reader.readAsDataURL(audioBlob);
+          };
+          try {
+            mediaRecorder.stop();
+          } catch (_) { }
+        } else {
+          restoreMusicGain(1.0, 400);
+        }
+      }, 70);
+    }
+
+    async function executeVoiceAction(data) {
+      const isNavOrExplain = ['navigate_region', 'explain_story', 'explain_science', 'explain_more'].includes(data.action);
+
+      if (isNavOrExplain && data.region_id) {
+        // 1) Move globe camera + circular indicator to region_id
+        await selectAndPlayTrack(data.region_id);
+        // 2) Start /api/stream/{region_id} at 0.18 ducked volume
+        duckMusicGain(0.18, 150);
+        if (audio.paused) {
+          safePlayAudio();
+        }
+
+        // 3) Play #kokoroVoicePlayer (Kokoro narration Blob URL) cleanly to completion
+        if (data.audio_base64) {
+          let blobUrl = null;
+          try {
+            const byteChars = atob(data.audio_base64);
+            const byteNums = new Uint8Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+              byteNums[i] = byteChars.charCodeAt(i);
+            }
+            const blob = new Blob([byteNums], { type: 'audio/ogg; codecs=opus' });
+            blobUrl = URL.createObjectURL(blob);
+          } catch (e) {
+            blobUrl = `data:audio/ogg;codecs=opus;base64,${data.audio_base64}`;
+          }
+
+          voiceAudio.src = blobUrl;
+          voiceAudio.onended = () => {
+            // 4) Restore music volume back to 1.0 (clamped [0, 1]) ONLY inside onended
+            restoreMusicGain(1.0, 400);
+            if (blobUrl && blobUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(blobUrl);
+            }
+          };
+          voiceAudio.onerror = (e) => {
+            console.warn('Voice playback error:', e);
+            restoreMusicGain(1.0, 400);
+            if (blobUrl && blobUrl.startsWith('blob:')) {
+              URL.revokeObjectURL(blobUrl);
+            }
+          };
+          safePlayAudio(voiceAudio);
+        } else {
+          restoreMusicGain(1.0, 400);
+        }
+        return;
+      }
+
+      if (data.action === 'search_svs') {
+        const query = data.svs_query || 'smoke';
+        await autoSearchAndPairSvs(query, data.svs_id, data.spoken_reply);
+        return;
+      }
+
+      if (data.action === 'play_music') {
+        if (audio.paused) togglePlay();
+        restoreMusicGain(1.0, 400);
+      } else if (data.action === 'pause_music') {
+        if (!audio.paused) togglePlay();
+      } else if (data.action === 'set_month' && data.month != null) {
+        if (String(selectedYear) !== '2025') {
+          selectTimelineYear('2025');
+        }
+        const monthDoys = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        const mIdx = Math.max(0, Math.min(11, data.month - 1));
+        const targetDoy = monthDoys[mIdx];
+        yearSlider.value = targetDoy;
+        selectedDoy = targetDoy;
+        onTimelineChange();
+        restoreMusicGain(1.0, 400);
+      }
+
+      if (data.audio_base64) {
+        duckMusicGain(0.18, 150);
+        let blobUrl = null;
+        try {
+          const byteChars = atob(data.audio_base64);
+          const byteNums = new Uint8Array(byteChars.length);
+          for (let i = 0; i < byteChars.length; i++) {
+            byteNums[i] = byteChars.charCodeAt(i);
+          }
+          const blob = new Blob([byteNums], { type: 'audio/ogg; codecs=opus' });
+          blobUrl = URL.createObjectURL(blob);
+        } catch (e) {
+          blobUrl = `data:audio/ogg;codecs=opus;base64,${data.audio_base64}`;
+        }
+
+        voiceAudio.src = blobUrl;
+        voiceAudio.onended = () => {
+          restoreMusicGain(1.0, 400);
+          if (blobUrl && blobUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(blobUrl);
+          }
+        };
+        voiceAudio.onerror = (e) => {
+          console.warn('Voice playback error:', e);
+          restoreMusicGain(1.0, 400);
+          if (blobUrl && blobUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(blobUrl);
+          }
+        };
+        safePlayAudio(voiceAudio);
+      } else {
+        restoreMusicGain(1.0, 400);
+      }
+    }
+
+    // Global Keyboard Handler for Voice Guidance (Enter/Esc in modal, Spacebar hold/release)
+    window.addEventListener('keydown', (e) => {
+      if (voiceModalOpen) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          activateVoiceGuidance(true);
+          return;
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          activateVoiceGuidance(false);
+          return;
+        }
+      }
+
+      const tag = (e.target.tagName || '').toUpperCase();
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+      if (e.code === 'Space' && !e.repeat && voiceGuidanceEnabled) {
+        e.preventDefault();
+        isSpaceHeld = true;
+        try {
+          if (kokoroVoicePlayer) {
+            kokoroVoicePlayer.pause();
+          }
+        } catch (_) {}
+        duckMusicGain(0.05, 80);
+        startVoiceCapture();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'Space' && isSpaceHeld) {
+        e.preventDefault();
+        isSpaceHeld = false;
+        stopVoiceCapture();
+      }
+    });
+
+    async function extractFramesAndSonify(videoSource, maxSeconds = 45, svsId = null) {
+      const vEl = document.createElement('video');
+      vEl.muted = true;
+      vEl.playsInline = true;
+      vEl.crossOrigin = 'anonymous';
+
+      let objectUrl = null;
+      if (videoSource instanceof Blob || videoSource instanceof File) {
+        objectUrl = URL.createObjectURL(videoSource);
+        vEl.src = objectUrl;
+      } else if (typeof videoSource === 'string') {
+        vEl.src = videoSource;
+      }
+
+      await new Promise((resolve, reject) => {
+        vEl.onloadedmetadata = () => resolve();
+        vEl.onerror = (err) => {
+          console.warn('vEl video metadata load error:', err);
+          setVisualMode('oscar');
+          if (svsTexture) {
+            svsTexture.dispose();
+            svsTexture = null;
+          }
+          reject(new Error('Failed to load video metadata'));
+        };
+      });
+
+      const duration = Math.min(Math.max(16, Math.floor(vEl.duration || 35)), maxSeconds);
+      const canvas = document.createElement('canvas');
+      canvas.width = 160;
+      canvas.height = 90;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+      const frame_energies = [];
+      const statusEl = document.getElementById('svsStatus');
+      if (statusEl) statusEl.textContent = `Extracting frames (0 of ${duration}) via canvas GPU...`;
+
+      let prevData = null;
+      const totalPixels = canvas.width * canvas.height;
+
+      for (let sec = 0; sec < duration; sec++) {
+        vEl.currentTime = sec;
+        await new Promise(r => { vEl.onseeked = r; });
+        ctx.drawImage(vEl, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+
+        let sumL = 0, sumR = 0, sumG = 0, sumB = 0, diff = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+          sumL += lum;
+          sumR += r;
+          sumG += g;
+          sumB += b;
+          if (prevData) {
+            diff += Math.abs(d[i] - prevData[i]) + Math.abs(d[i + 1] - prevData[i + 1]) + Math.abs(d[i + 2] - prevData[i + 2]);
+          }
+        }
+
+        const brightness = sumL / (totalPixels * 255);
+        const rNorm = sumR / (totalPixels * 255);
+        const gNorm = sumG / (totalPixels * 255);
+        const bNorm = sumB / (totalPixels * 255);
+        const motion = prevData ? diff / (totalPixels * 3 * 255) : 0;
+        prevData = new Uint8ClampedArray(d);
+
+        frame_energies.push({
+          sec,
+          brightness: Number(brightness.toFixed(4)),
+          motion: Number(motion.toFixed(4)),
+          r: Number(rNorm.toFixed(4)),
+          g: Number(gNorm.toFixed(4)),
+          b: Number(bNorm.toFixed(4))
+        });
+
+        if (statusEl) statusEl.textContent = `Extracting frames (${sec + 1} of ${duration}) via canvas GPU...`;
+      }
+
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (statusEl) statusEl.textContent = 'Generating soundscape with FluidSynth + FluidR3_GM...';
+
+      const targetId = svsId ? String(svsId) : (selectedSvs?.id ? String(selectedSvs.id) : '');
+      const res = await fetch(`${API_BASE}/api/generate-music`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          svs_id: targetId || null,
+          frame_energies: frame_energies,
+          mode: currentMode || 'musical'
+        })
+      });
+
+      if (res.status === 429) {
+        const errData = await res.json();
+        if (statusEl) statusEl.textContent = errData.message || 'Server busy, please retry in 5s.';
+        if (errData.audio_base64) {
+          new Audio(`data:audio/ogg;codecs=opus;base64,${errData.audio_base64}`).play().catch(() => { });
+        }
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`Generation failed: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      if (data.audio_base64) {
+        initWebAudio();
+        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+        audio.src = `data:audio/ogg;codecs=opus;base64,${data.audio_base64}`;
+        audio.loop = true;
+
+        // Synchronize SVS video on globe and audio
+        if (svsVideo) {
+          svsVideo.currentTime = 0;
+          safePlaySvsVideo();
+        }
+        audio.currentTime = 0;
+        audio.play().catch(() => { });
+
+        const actualId = targetId || 'visual';
+        const badgeText = `Generated from SVS #${actualId} video frames (FluidR3_GM)`;
+        if (statusEl) statusEl.textContent = badgeText;
+        const trackLabelEl = document.getElementById('trackLabel');
+        if (trackLabelEl) trackLabelEl.textContent = badgeText;
+        const pinnedBadgeEl = document.getElementById('pinnedBadge');
+        if (pinnedBadgeEl) pinnedBadgeEl.textContent = badgeText;
+        const frameBadge = document.getElementById('svsFrameBadge');
+        if (frameBadge) {
+          frameBadge.textContent = badgeText;
+          frameBadge.hidden = false;
+        }
+      }
+    }
+
+    async function checkBackendWarmup() {
+      const notice = document.getElementById('warmupNotice');
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.kokoro_ready) {
+            if (notice) notice.classList.add('show');
+            setTimeout(checkBackendWarmup, 2500);
+          } else {
+            if (notice) notice.classList.remove('show');
+          }
+        }
+      } catch (_) {
+        setTimeout(checkBackendWarmup, 3000);
+      }
+    }
+    checkBackendWarmup();
+
+    initStaticSvsView();
+
+    Object.assign(window, {
+      resetGlobe, seek, restartAudio, togglePlay, stopAudio, toggleLoop, downloadFile, switchMode, setVisualMode,
+      toggleLeftPanel, closeLeftPanel, minimizeLeftPanel, restoreLeftPanel, toggleMaximizePanel, switchPanelView,
+      toggleSvsCatalog, selectAndPlayTrack, loadAuditForSelectedTrack, loadAuditTable, pairSelectedSvsWithSoundscape,
+      selectTimelineYear, activateVoiceGuidance, extractFramesAndSonify
+    });
+  </script>
+</body>
+
+</html>

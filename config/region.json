@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "years": [2024, 2025],
+  "defaults": {
+    "hold_threshold": 0.013,
+    "max_missing_fraction": 0.5,
+    "normalize": "per_box_p5_p95"
+  },
+  "regions": [
+    {"id": "gulf_stream", "name": "North Atlantic (Gulf Stream)",
+     "lat": [30, 40], "lon": [280, 300]},
+
+    {"id": "kuroshio", "name": "North Pacific (Kuroshio)",
+     "lat": [28, 40], "lon": [130, 160]},
+
+    {"id": "east_australian", "name": "South Pacific (East Australian Current)",
+     "lat": [-40, -25], "lon": [150, 170]},
+
+    {"id": "brazil_malvinas", "name": "South Atlantic (Brazil-Malvinas)",
+     "lat": [-50, -35], "lon": [300, 320]},
+
+    {"id": "arabian_sea", "name": "Indian Ocean (Arabian Sea)",
+     "lat": [5, 25], "lon": [50, 75]},
+
+    {"id": "drake_acc", "name": "Southern Ocean (Drake Passage / ACC)",
+     "lat": [-65, -55], "lon": [290, 310]},
+
+    {"id": "nordic_seas", "name": "Arctic (Nordic Seas)",
+     "lat": [62, 75], "lon": [-15, 20],
+     "exceptions": {
+       "wraps_zero_meridian": true,
+       "sea_ice": "expect missing cells; rest, never zero",
+       "fallback_region": "equatorial_pacific"
+     }},
+
+    {"id": "equatorial_pacific", "name": "Equatorial Pacific (El Nino region)",
+     "lat": [-5, 5], "lon": [180, 240],
+     "enabled": false}
+  ],
+  "overrides": {}
+}

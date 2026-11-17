@@ -1,0 +1,18 @@
+[
+  {"day_idx": 0, "date": "2026-01-01", "file": "4_0.json"},
+  {"day_idx": 1, "date": "2026-01-02", "file": "4_1.json"},
+  {"day_idx": 2, "date": "2026-01-03", "file": "4_2.json"},
+  {"day_idx": 3, "date": "2026-01-04", "file": "4_3.json"},
+  {"day_idx": 4, "date": "2026-01-05", "file": "4_4.json"},
+  {"day_idx": 5, "date": "2026-01-06", "file": "4_5.json"},
+  {"day_idx": 6, "date": "2026-01-07", "file": "4_6.json"},
+  {"day_idx": 7, "date": "2026-01-08", "file": "4_7.json"},
+  {"day_idx": 8, "date": "2026-01-09", "file": "4_8.json"},
+  {"day_idx": 9, "date": "2026-01-10", "file": "4_9.json"},
+  {"day_idx": 10, "date": "2026-01-11", "file": "4_10.json"},
+  {"day_idx": 11, "date": "2026-01-12", "file": "4_11.json"},
+  {"day_idx": 12, "date": "2026-01-13", "file": "4_12.json"},
+  {"day_idx": 13, "date": "2026-01-14", "file": "4_13.json"},
+  {"day_idx": 14, "date": "2026-01-15", "file": "4_14.json"},
+  {"day_idx": 15, "date": "2026-01-16", "file": "4_15.json"}
+]

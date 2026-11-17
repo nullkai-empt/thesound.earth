@@ -1,0 +1,1 @@
+/api/oscar_daily/:year  /data/oscar_:year.json  200

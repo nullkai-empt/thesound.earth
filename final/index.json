@@ -1,0 +1,302 @@
+[
+  {
+    "id": "gulf_stream",
+    "domain": "ocean",
+    "region": "North Atlantic (Gulf Stream)",
+    "year": 2025,
+    "bbox": [
+      280,
+      30,
+      300,
+      40
+    ],
+    "bars": 53,
+    "tempo": 60,
+    "bar_seconds": 4.0,
+    "duration_s": 212.0,
+    "scale": "Natural Minor (Aeolian)",
+    "key": "C",
+    "bytes": 1346029,
+    "checksum": "e4bc20cdc5e138992521d4e4839a7ff2e00bccdf8afed6438b99a83ed3378c92"
+  },
+  {
+    "id": "kuroshio",
+    "domain": "ocean",
+    "region": "North Pacific (Kuroshio)",
+    "year": 2025,
+    "bbox": [
+      130,
+      28,
+      160,
+      40
+    ],
+    "bars": 53,
+    "tempo": 58,
+    "bar_seconds": 4.1379,
+    "duration_s": 219.3,
+    "scale": "Insen Pentatonic",
+    "key": "C",
+    "bytes": 1340846,
+    "checksum": "705ba57635f519706cbcac48c6a3c31c04aeeb9121cf3fe3364decdccf7794e2"
+  },
+  {
+    "id": "east_australian",
+    "domain": "ocean",
+    "region": "South Pacific (East Australian Current)",
+    "year": 2025,
+    "bbox": [
+      150,
+      -40,
+      170,
+      -25
+    ],
+    "bars": 53,
+    "tempo": 66,
+    "bar_seconds": 3.6364,
+    "duration_s": 192.7,
+    "scale": "Dorian",
+    "key": "C",
+    "bytes": 1262631,
+    "checksum": "9466dabcfb03818f1663c0b4e2fd616348b01839a70f51bf188ef83d8f0dd2a7"
+  },
+  {
+    "id": "brazil_malvinas",
+    "domain": "ocean",
+    "region": "South Atlantic (Brazil-Malvinas)",
+    "year": 2025,
+    "bbox": [
+      300,
+      -50,
+      320,
+      -35
+    ],
+    "bars": 53,
+    "tempo": 64,
+    "bar_seconds": 3.75,
+    "duration_s": 198.8,
+    "scale": "Harmonic Minor",
+    "key": "C",
+    "bytes": 1274408,
+    "checksum": "7dbda557bda527ea6bc92e964f0542a00c8895d2e7c37aaf3da234aa87224e82"
+  },
+  {
+    "id": "arabian_sea",
+    "domain": "ocean",
+    "region": "Indian Ocean (Arabian Sea)",
+    "year": 2025,
+    "bbox": [
+      50,
+      5,
+      75,
+      25
+    ],
+    "bars": 53,
+    "tempo": 68,
+    "bar_seconds": 3.5294,
+    "duration_s": 187.1,
+    "scale": "Hijaz / Phrygian Dominant",
+    "key": "C",
+    "bytes": 1196595,
+    "checksum": "a290784c9fe9f299614f7f581d0d099cf86812a73d24dd5d49cd0c4fd0d25e43"
+  },
+  {
+    "id": "drake_acc",
+    "domain": "ocean",
+    "region": "Southern Ocean (Drake Passage / ACC)",
+    "year": 2025,
+    "bbox": [
+      290,
+      -65,
+      310,
+      -55
+    ],
+    "bars": 53,
+    "tempo": 56,
+    "bar_seconds": 4.2857,
+    "duration_s": 227.1,
+    "scale": "Natural Minor (Aeolian)",
+    "key": "C",
+    "bytes": 1432784,
+    "checksum": "3189bc01774acdfed0c8e2ed916d810beeca5303d658381b43455ca5126b43ad"
+  },
+  {
+    "id": "nordic_seas",
+    "domain": "ocean",
+    "region": "Arctic (Nordic Seas)",
+    "year": 2025,
+    "bbox": [
+      -15,
+      62,
+      20,
+      75
+    ],
+    "bars": 53,
+    "tempo": 56,
+    "bar_seconds": 4.2857,
+    "duration_s": 227.1,
+    "scale": "Dorian",
+    "key": "C",
+    "bytes": 1523062,
+    "checksum": "d1065d876844f0d5d02ca6389f8369a022810ff65499590de8468aea028d538f"
+  },
+  {
+    "id": "amazon",
+    "domain": "land_combined",
+    "region": "South America (Amazon Basin)",
+    "year": 2025,
+    "bbox": [
+      -65.0,
+      -15.0,
+      -45.0,
+      -3.0
+    ],
+    "bars": 53,
+    "tempo": 65,
+    "bar_seconds": 3.6923,
+    "duration_s": 195.7,
+    "scale": "Minor Pentatonic",
+    "key": "C",
+    "bytes": 1328658,
+    "checksum": "97b4b60eb2b12a342739526d0255f3f8b626f431feeff22e8f870f7f831d51f8"
+  },
+  {
+    "id": "congo",
+    "domain": "land_combined",
+    "region": "Central Africa (Congo Basin)",
+    "year": 2025,
+    "bbox": [
+      15.0,
+      -5.0,
+      30.0,
+      5.0
+    ],
+    "bars": 53,
+    "tempo": 72,
+    "bar_seconds": 3.3333,
+    "duration_s": 176.7,
+    "scale": "Major Pentatonic",
+    "key": "C",
+    "bytes": 1151207,
+    "checksum": "16416ad551e407f6ec8de9ed93ffb0cf884438def94ebcd9f9d32c21b6f80381"
+  },
+  {
+    "id": "se_asia",
+    "domain": "land_combined",
+    "region": "Southeast Asia (Indochina)",
+    "year": 2025,
+    "bbox": [
+      98.0,
+      12.0,
+      106.0,
+      22.0
+    ],
+    "bars": 53,
+    "tempo": 64,
+    "bar_seconds": 3.75,
+    "duration_s": 198.8,
+    "scale": "Pelog Pentatonic Approximation",
+    "key": "C",
+    "bytes": 1304950,
+    "checksum": "9cb00506af978961000873138e0623a9151a890f04ec6aa017c1f0f163ac02ab"
+  },
+  {
+    "id": "australia",
+    "domain": "land_combined",
+    "region": "Eastern Australia",
+    "year": 2025,
+    "bbox": [
+      130.0,
+      -35.0,
+      150.0,
+      -20.0
+    ],
+    "bars": 53,
+    "tempo": 60,
+    "bar_seconds": 4.0,
+    "duration_s": 212.0,
+    "scale": "Natural Minor (Aeolian)",
+    "key": "C",
+    "bytes": 1390998,
+    "checksum": "3776ebbafbe0de9b96a312c622cca548f2b0035d9ce76c5299663ef67d4900a9"
+  },
+  {
+    "id": "w_north_america",
+    "domain": "land_combined",
+    "region": "Western North America",
+    "year": 2025,
+    "bbox": [
+      -125.0,
+      35.0,
+      -115.0,
+      48.0
+    ],
+    "bars": 53,
+    "tempo": 64,
+    "bar_seconds": 3.75,
+    "duration_s": 198.8,
+    "scale": "Mixolydian",
+    "key": "C",
+    "bytes": 1264820,
+    "checksum": "efe0e686f300d67edc7abacee62d5329769f0e26c62b48510a7711dd82d0458f"
+  },
+  {
+    "id": "siberia",
+    "domain": "land_fire_only",
+    "region": "Northern Asia (Siberia)",
+    "year": 2025,
+    "bbox": [
+      95.0,
+      55.0,
+      120.0,
+      65.0
+    ],
+    "bars": 53,
+    "tempo": 62,
+    "bar_seconds": 3.871,
+    "duration_s": 205.2,
+    "scale": "Suspended Pentatonic",
+    "key": "C",
+    "bytes": 1545695,
+    "checksum": "391e9d7288f6809188635c67d2911ad411d31dd64f453e2fd7b11f4c9efa2942"
+  },
+  {
+    "id": "india",
+    "domain": "land_combined",
+    "region": "South Asia (India)",
+    "year": 2025,
+    "bbox": [
+      73.0,
+      18.0,
+      85.0,
+      28.0
+    ],
+    "bars": 53,
+    "tempo": 70,
+    "bar_seconds": 3.4286,
+    "duration_s": 181.7,
+    "scale": "Kafi Thaat / Dorian",
+    "key": "C",
+    "bytes": 1254780,
+    "checksum": "27cbae9a03c164a42a7f65b362d4051d98979535d4f4e3e276587a09475c4d87"
+  },
+  {
+    "id": "europe",
+    "domain": "land_combined",
+    "region": "Southern Europe / Mediterranean",
+    "year": 2025,
+    "bbox": [
+      -8.0,
+      37.0,
+      15.0,
+      45.0
+    ],
+    "bars": 53,
+    "tempo": 66,
+    "bar_seconds": 3.6364,
+    "duration_s": 192.7,
+    "scale": "Phrygian Dominant",
+    "key": "C",
+    "bytes": 1293829,
+    "checksum": "251d8b6b29896f2bafa4728b585f8a0ebadf57a2a7e938f64506be58758dc683"
+  }
+]

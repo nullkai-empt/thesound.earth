@@ -1,0 +1,32 @@
+{
+  "project": "THESOUND.EARTH",
+  "mapping_version": "aetherwaves-ocean-v1",
+  "visual_mapping": {
+    "version": "visual-v1",
+    "description": "Deterministic image-feature mapping; visual estimates are not scientific measurement values.",
+    "pitch_midi_range": [48, 72],
+    "motion_pitch_span": 5,
+    "brightness_to_amplitude": [0.12, 0.67],
+    "edge_density_event_rate": [2, 10],
+    "motion_to_pulse_amplitude": [0.12, 0.57]
+  },
+  "dataset": "OSCAR_L4_OC_FINAL_V2.0",
+  "source_doi": "10.5067/OSCAR-25F20",
+  "reference_region": "Arabian Sea (sample calibration)",
+  "normalization": {
+    "speed_mps": { "low": 0.05, "high": 1.25 },
+    "u_abs_mps": { "low": 0.0, "high": 1.00 },
+    "v_abs_mps": { "low": 0.0, "high": 1.00 }
+  },
+  "sonification": {
+    "event_rate_per_min": { "min": 36.0, "max": 132.0 },
+    "voice_u_positive_midi": { "min": 60, "max": 79 },
+    "voice_u_negative_midi": { "min": 48, "max": 59 },
+    "voice_v_positive_midi": { "min": 72, "max": 88 },
+    "voice_v_negative_midi": { "min": 55, "max": 67 },
+    "scale_intervals": [0, 2, 3, 5, 7, 9, 10],
+    "scale_root_midi": 62,
+    "phrase_duration_sec": 15.0,
+    "sample_rate_hz": 44100
+  }
+}

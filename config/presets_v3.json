@@ -1,0 +1,671 @@
+{
+  "version": "v3",
+  "description": "Regional presets for AetherWaves Engine v3. Labelled inspired by, not authentic.",
+  "presets": {
+    "gulf_stream": {
+      "name": "North Atlantic (Gulf Stream)",
+      "domain": "ocean",
+      "label": "Atlantic maritime orchestral \u2014 inspired by, not authentic",
+      "tempo": 60,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        10
+      ],
+      "scale_name": "Natural Minor (Aeolian)",
+      "gm_programs": {
+        "pad": 94,
+        "bass": 42,
+        "melody": 49,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Halo Pad (GM 94)",
+        "bass": "Cello (GM 42)",
+        "melody": "String Ensemble 2 (GM 49)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "standard_maracas_kick",
+      "pan": {
+        "pad": -0.2,
+        "bass": 0.0,
+        "melody": 0.2,
+        "percussion": 0.1,
+        "riser": -0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 4.0,
+      "color_tone": 11,
+      "color_tone_name": "Major 7th (B)",
+      "loop": true
+    },
+    "kuroshio": {
+      "name": "North Pacific (Kuroshio)",
+      "domain": "ocean",
+      "label": "East Asian maritime \u2014 inspired by, not authentic",
+      "tempo": 58,
+      "scale": [
+        0,
+        1,
+        5,
+        7,
+        10
+      ],
+      "scale_name": "Insen Pentatonic",
+      "gm_programs": {
+        "pad": 89,
+        "bass": 43,
+        "melody": 107,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Warm Pad (GM 89)",
+        "bass": "Contrabass (GM 43)",
+        "melody": "Koto (GM 107)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "taiko_temple_drums",
+      "pan": {
+        "pad": -0.3,
+        "bass": 0.0,
+        "melody": 0.3,
+        "percussion": 0.0,
+        "riser": -0.4,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 4.1379,
+      "color_tone": 3,
+      "color_tone_name": "Minor 3rd (Eb)",
+      "loop": true
+    },
+    "east_australian": {
+      "name": "South Pacific (East Australian Current)",
+      "domain": "ocean",
+      "label": "South Pacific ocean modal \u2014 inspired by, not authentic",
+      "tempo": 66,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        9,
+        10
+      ],
+      "scale_name": "Dorian",
+      "gm_programs": {
+        "pad": 94,
+        "bass": 42,
+        "melody": 73,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Halo Pad (GM 94)",
+        "bass": "Cello (GM 42)",
+        "melody": "Flute (GM 73)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "gentle_ocean_shaker",
+      "pan": {
+        "pad": -0.25,
+        "bass": 0.0,
+        "melody": 0.25,
+        "percussion": 0.15,
+        "riser": -0.2,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.6364,
+      "color_tone": 6,
+      "color_tone_name": "Tritone (F#)",
+      "loop": true
+    },
+    "brazil_malvinas": {
+      "name": "South Atlantic (Brazil-Malvinas)",
+      "domain": "ocean",
+      "label": "South Atlantic dramatic \u2014 inspired by, not authentic",
+      "tempo": 64,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        11
+      ],
+      "scale_name": "Harmonic Minor",
+      "gm_programs": {
+        "pad": 89,
+        "bass": 42,
+        "melody": 40,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Warm Pad (GM 89)",
+        "bass": "Cello (GM 42)",
+        "melody": "Violin (GM 40)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "tango_inflected_percussion",
+      "pan": {
+        "pad": -0.2,
+        "bass": 0.0,
+        "melody": 0.3,
+        "percussion": -0.1,
+        "riser": 0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.75,
+      "color_tone": 6,
+      "color_tone_name": "Tritone (F#)",
+      "loop": true
+    },
+    "arabian_sea": {
+      "name": "Indian Ocean (Arabian Sea)",
+      "domain": "ocean",
+      "label": "Arabian Gulf maritime \u2014 inspired by, not authentic",
+      "tempo": 68,
+      "scale": [
+        0,
+        1,
+        4,
+        5,
+        7,
+        8,
+        10
+      ],
+      "scale_name": "Hijaz / Phrygian Dominant",
+      "gm_programs": {
+        "pad": 91,
+        "bass": 43,
+        "melody": 15,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Choir Pad (GM 91)",
+        "bass": "Contrabass (GM 43)",
+        "melody": "Santur / Dulcimer (GM 15)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "framedrum_riqq_percussion",
+      "pan": {
+        "pad": -0.3,
+        "bass": 0.0,
+        "melody": 0.25,
+        "percussion": 0.2,
+        "riser": -0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.5294,
+      "color_tone": 2,
+      "color_tone_name": "Major 2nd (D)",
+      "loop": true
+    },
+    "drake_acc": {
+      "name": "Southern Ocean (Drake Passage / ACC)",
+      "domain": "ocean",
+      "label": "Sub-polar glacial current \u2014 inspired by, not authentic",
+      "tempo": 56,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        10
+      ],
+      "scale_name": "Natural Minor (Aeolian)",
+      "gm_programs": {
+        "pad": 95,
+        "bass": 43,
+        "melody": 60,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Sweep Pad (GM 95)",
+        "bass": "Contrabass (GM 43)",
+        "melody": "French Horn (GM 60)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "deep_surge_percussion",
+      "pan": {
+        "pad": -0.35,
+        "bass": 0.0,
+        "melody": 0.2,
+        "percussion": 0.1,
+        "riser": -0.2,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 4.2857,
+      "color_tone": 1,
+      "color_tone_name": "Minor 2nd (Db)",
+      "loop": true
+    },
+    "nordic_seas": {
+      "name": "Arctic (Nordic Seas)",
+      "domain": "ocean",
+      "label": "Sub-arctic atmospheric \u2014 inspired by, not authentic",
+      "tempo": 56,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        9,
+        10
+      ],
+      "scale_name": "Dorian",
+      "gm_programs": {
+        "pad": 92,
+        "bass": 42,
+        "melody": 110,
+        "riser": 119,
+        "texture": 122,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Bowed Pad (GM 92)",
+        "bass": "Cello (GM 42)",
+        "melody": "Fiddle (GM 110)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "minimal_polar_pulse",
+      "pan": {
+        "pad": -0.25,
+        "bass": 0.0,
+        "melody": 0.25,
+        "percussion": 0.0,
+        "riser": -0.35,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 4.2857,
+      "color_tone": 1,
+      "color_tone_name": "Minor 2nd (Db)",
+      "loop": true
+    },
+    "amazon": {
+      "name": "South America (Amazon Basin)",
+      "domain": "land_combined",
+      "label": "Tropical rainforest canopy \u2014 inspired by, not authentic",
+      "tempo": 65,
+      "scale": [
+        0,
+        3,
+        5,
+        7,
+        10
+      ],
+      "scale_name": "Minor Pentatonic",
+      "gm_programs": {
+        "pad": 89,
+        "bass": 42,
+        "melody": 75,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Warm Pad (GM 89)",
+        "bass": "Cello (GM 42)",
+        "melody": "Pan Flute (GM 75)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "woodland_shaker_surdo",
+      "pan": {
+        "pad": -0.3,
+        "bass": 0.0,
+        "melody": 0.2,
+        "percussion": 0.15,
+        "riser": -0.25,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.6923,
+      "color_tone": 6,
+      "color_tone_name": "Tritone / Blues Note (Gb)",
+      "loop": true
+    },
+    "congo": {
+      "name": "Central Africa (Congo Basin)",
+      "domain": "land_combined",
+      "label": "Equatorial river basin \u2014 inspired by, not authentic",
+      "tempo": 72,
+      "scale": [
+        0,
+        2,
+        4,
+        7,
+        9
+      ],
+      "scale_name": "Major Pentatonic",
+      "gm_programs": {
+        "pad": 94,
+        "bass": 35,
+        "melody": 108,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Halo Pad (GM 94)",
+        "bass": "Fretless Bass (GM 35)",
+        "melody": "Kalimba (GM 108)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "polyrhythmic_conga_shaker",
+      "pan": {
+        "pad": -0.2,
+        "bass": 0.0,
+        "melody": 0.3,
+        "percussion": -0.15,
+        "riser": 0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.3333,
+      "color_tone": 10,
+      "color_tone_name": "Minor 7th (Bb)",
+      "loop": true
+    },
+    "se_asia": {
+      "name": "Southeast Asia (Indochina)",
+      "domain": "land_combined",
+      "label": "Mekong tropical basin \u2014 inspired by, not authentic",
+      "tempo": 64,
+      "scale": [
+        0,
+        1,
+        3,
+        7,
+        8
+      ],
+      "scale_name": "Pelog Pentatonic Approximation",
+      "gm_programs": {
+        "pad": 89,
+        "bass": 43,
+        "melody": 11,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Warm Pad (GM 89)",
+        "bass": "Contrabass (GM 43)",
+        "melody": "Vibraphone / Gamelan Metallic (GM 11)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "gong_struck_metallophone",
+      "pan": {
+        "pad": -0.25,
+        "bass": 0.0,
+        "melody": 0.25,
+        "percussion": 0.1,
+        "riser": -0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.75,
+      "color_tone": 5,
+      "color_tone_name": "Perfect 4th (F)",
+      "loop": true
+    },
+    "australia": {
+      "name": "Eastern Australia",
+      "domain": "land_combined",
+      "label": "Bushland acoustic \u2014 inspired by, not authentic",
+      "tempo": 60,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        8,
+        10
+      ],
+      "scale_name": "Natural Minor (Aeolian)",
+      "gm_programs": {
+        "pad": 94,
+        "bass": 43,
+        "melody": 25,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Halo Pad (GM 94)",
+        "bass": "Contrabass (GM 43)",
+        "melody": "Steel String Guitar (GM 25)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "earthy_wood_shaker",
+      "pan": {
+        "pad": -0.2,
+        "bass": 0.0,
+        "melody": 0.3,
+        "percussion": -0.1,
+        "riser": 0.2,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 4.0,
+      "color_tone": 11,
+      "color_tone_name": "Major 7th (B)",
+      "loop": true
+    },
+    "w_north_america": {
+      "name": "Western North America",
+      "domain": "land_combined",
+      "label": "Pacific Northwest & Sierra woodland \u2014 inspired by, not authentic",
+      "tempo": 64,
+      "scale": [
+        0,
+        2,
+        4,
+        5,
+        7,
+        9,
+        10
+      ],
+      "scale_name": "Mixolydian",
+      "gm_programs": {
+        "pad": 94,
+        "bass": 32,
+        "melody": 24,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Halo Pad (GM 94)",
+        "bass": "Acoustic Bass (GM 32)",
+        "melody": "Nylon String Guitar (GM 24)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "acoustic_brushed_percussion",
+      "pan": {
+        "pad": -0.25,
+        "bass": 0.0,
+        "melody": 0.25,
+        "percussion": 0.15,
+        "riser": -0.25,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.75,
+      "color_tone": 3,
+      "color_tone_name": "Minor 3rd (Eb)",
+      "loop": true
+    },
+    "siberia": {
+      "name": "Northern Asia (Siberia)",
+      "domain": "land_fire_only",
+      "label": "Taiga boreal \u2014 inspired by, not authentic",
+      "tempo": 62,
+      "scale": [
+        0,
+        2,
+        5,
+        7,
+        10
+      ],
+      "scale_name": "Suspended Pentatonic",
+      "gm_programs": {
+        "pad": 95,
+        "bass": 43,
+        "melody": 71,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Sweep Pad (GM 95)",
+        "bass": "Contrabass (GM 43)",
+        "melody": "Clarinet (GM 71)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "shamanic_frame_drum",
+      "pan": {
+        "pad": -0.3,
+        "bass": 0.0,
+        "melody": 0.2,
+        "percussion": 0.0,
+        "riser": -0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.871,
+      "color_tone": 6,
+      "color_tone_name": "Tritone (F#)",
+      "loop": true
+    },
+    "india": {
+      "name": "South Asia (India)",
+      "domain": "land_combined",
+      "label": "Subcontinental acoustic \u2014 inspired by, not authentic",
+      "tempo": 70,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        9,
+        10
+      ],
+      "scale_name": "Kafi Thaat / Dorian",
+      "gm_programs": {
+        "pad": 91,
+        "bass": 42,
+        "melody": 104,
+        "riser": 119,
+        "texture": 89,
+        "drone": 104
+      },
+      "gm_instrument_names": {
+        "pad": "Choir Pad (GM 91)",
+        "bass": "Cello (GM 42)",
+        "melody": "Sitar (GM 104)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "tabla_inspired_percussion",
+      "pan": {
+        "pad": -0.25,
+        "bass": 0.0,
+        "melody": 0.3,
+        "percussion": -0.15,
+        "riser": 0.25,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.4286,
+      "color_tone": 6,
+      "color_tone_name": "Tivra Madhyam / Tritone (F#)",
+      "loop": true
+    },
+    "europe": {
+      "name": "Southern Europe / Mediterranean",
+      "domain": "land_combined",
+      "label": "Mediterranean woodland \u2014 inspired by, not authentic",
+      "tempo": 66,
+      "scale": [
+        0,
+        1,
+        4,
+        5,
+        7,
+        8,
+        10
+      ],
+      "scale_name": "Phrygian Dominant",
+      "gm_programs": {
+        "pad": 89,
+        "bass": 42,
+        "melody": 24,
+        "riser": 119,
+        "texture": 89,
+        "drone": 89
+      },
+      "gm_instrument_names": {
+        "pad": "Warm Pad (GM 89)",
+        "bass": "Cello (GM 42)",
+        "melody": "Nylon String Guitar (GM 24)",
+        "riser": "Reverse Cymbal (GM 119)"
+      },
+      "drum_pattern": "tambourine_cajon_percussion",
+      "pan": {
+        "pad": -0.2,
+        "bass": 0.0,
+        "melody": 0.25,
+        "percussion": 0.15,
+        "riser": -0.3,
+        "texture": 0.2,
+        "drone": -0.1
+      },
+      "mapping_version": "v3",
+      "bar_seconds": 3.6364,
+      "color_tone": 2,
+      "color_tone_name": "Major 2nd (D)",
+      "loop": true
+    }
+  }
+}

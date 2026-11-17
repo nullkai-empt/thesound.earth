@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: aetherwaves
+Version: 1.0.0
+Summary: AetherWaves deterministic scientific sonification engine for NASA OSCAR ocean currents
+Requires-Python: >=3.11
+Requires-Dist: numpy>=1.26
+Requires-Dist: xarray>=2024.1
+Requires-Dist: netCDF4>=1.6
+Requires-Dist: scipy>=1.12
+Requires-Dist: soundfile>=0.12

@@ -1,0 +1,22 @@
+{
+  "dataset": "OSCAR_L4_OC_FINAL_V2.0",
+  "provider": "NASA PO.DAAC",
+  "resolution": "0.25 deg daily",
+  "region_name": "North Atlantic (Gulf Stream)",
+  "bounding_box": {
+    "lat_min": 30.0,
+    "lat_max": 40.0,
+    "lon_min": 280.0,
+    "lon_max": 300.0,
+    "lon_deg_w_min": 60.0,
+    "lon_deg_w_max": 80.0
+  },
+  "years_used": [
+    "2023",
+    "2024",
+    "2025",
+    "2026 (Jan 1-16)"
+  ],
+  "last_2026_date": "16 Jan",
+  "source_doi": "10.5067/OSCAR-25F20"
+}

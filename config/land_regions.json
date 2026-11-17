@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "years": [2025],
+  "defaults": {
+    "hold_threshold": 0.013
+  },
+  "regions": [
+    {
+      "id": "amazon",
+      "name": "South America (Amazon Basin)",
+      "lat": [-15.0, -3.0],
+      "lon": [-65.0, -45.0],
+      "fires": {
+        "lat": [-15.0, -3.0],
+        "lon": [-65.0, -45.0]
+      },
+      "canopy_meridian": -60.0
+    },
+    {
+      "id": "congo",
+      "name": "Central Africa (Congo Basin)",
+      "lat": [-5.0, 5.0],
+      "lon": [15.0, 30.0],
+      "fires": {
+        "lat": [-5.0, 5.0],
+        "lon": [15.0, 30.0]
+      },
+      "canopy_meridian": 20.0
+    },
+    {
+      "id": "se_asia",
+      "name": "Southeast Asia (Indochina)",
+      "lat": [12.0, 22.0],
+      "lon": [98.0, 106.0],
+      "fires": {
+        "lat": [12.0, 22.0],
+        "lon": [98.0, 106.0]
+      },
+      "canopy_meridian": 100.0
+    },
+    {
+      "id": "australia",
+      "name": "Eastern Australia",
+      "lat": [-35.0, -20.0],
+      "lon": [130.0, 150.0],
+      "fires": {
+        "lat": [-35.0, -20.0],
+        "lon": [130.0, 150.0]
+      },
+      "canopy_meridian": 135.0
+    },
+    {
+      "id": "w_north_america",
+      "name": "Western North America",
+      "lat": [35.0, 48.0],
+      "lon": [-125.0, -115.0],
+      "fires": {
+        "lat": [35.0, 48.0],
+        "lon": [-125.0, -115.0]
+      },
+      "canopy_meridian": -115.0
+    },
+    {
+      "id": "siberia",
+      "name": "Northern Asia (Siberia)",
+      "lat": [55.0, 65.0],
+      "lon": [95.0, 120.0],
+      "fires": {
+        "lat": [55.0, 65.0],
+        "lon": [95.0, 120.0]
+      },
+      "canopy_meridian": null
+    },
+    {
+      "id": "india",
+      "name": "South Asia (India)",
+      "lat": [18.0, 28.0],
+      "lon": [73.0, 85.0],
+      "fires": {
+        "lat": [18.0, 28.0],
+        "lon": [73.0, 85.0]
+      },
+      "canopy_meridian": 78.0
+    },
+    {
+      "id": "europe",
+      "name": "Southern Europe / Mediterranean",
+      "lat": [37.0, 45.0],
+      "lon": [-8.0, 15.0],
+      "fires": {
+        "lat": [37.0, 45.0],
+        "lon": [-8.0, 15.0]
+      },
+      "canopy_meridian": 15.0
+    }
+  ]
+}
+
