@@ -26,19 +26,48 @@ RAW_OSCAR_DIR = DATA_DIR / "raw_oscar"
 
 MAX_FILE_BYTES = 20 * 1024 * 1024  # 20 MB target warning threshold
 
+def _handle_remove_readonly(func, path, exc):
+    import stat
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    except Exception:
+        pass
+
 def clean_dist():
     if DIST_DIR.exists():
         print(f"Cleaning existing {DIST_DIR}...")
-        shutil.rmtree(DIST_DIR)
+        try:
+            shutil.rmtree(DIST_DIR, onexc=_handle_remove_readonly)
+        except TypeError:
+            shutil.rmtree(DIST_DIR, onerror=_handle_remove_readonly)
     DIST_DIR.mkdir(parents=True, exist_ok=True)
 
 def copy_web_assets():
     print("Copying core web assets...")
+    api_base = os.environ.get("API_BASE", "").strip().rstrip("/")
     for fname in ["index.html", "flow.worker.js", "credits.html"]:
         src = WEB_DIR / fname
         if src.exists():
-            shutil.copy2(src, DIST_DIR / fname)
-            print(f"  Copied {fname}")
+            if fname == "index.html" and api_base:
+                content = src.read_text(encoding="utf-8")
+                if '<meta name="api-base" content="" />' in content:
+                    content = content.replace(
+                        '<meta name="api-base" content="" />',
+                        f'<meta name="api-base" content="{api_base}" />',
+                    )
+                else:
+                    import re
+                    content = re.sub(
+                        r'<meta\s+name=["\']api-base["\']\s+content=["\'][^"\']*["\']\s*/?>',
+                        f'<meta name="api-base" content="{api_base}" />',
+                        content,
+                    )
+                (DIST_DIR / fname).write_text(content, encoding="utf-8")
+                print(f"  Copied {fname} with API_BASE={api_base}")
+            else:
+                shutil.copy2(src, DIST_DIR / fname)
+                print(f"  Copied {fname}")
         else:
             print(f"  Warning: {src} not found")
 
